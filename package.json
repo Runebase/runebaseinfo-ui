@@ -4,8 +4,8 @@
   "description": "An open-source frontend for the Qtuminfo API",
   "scripts": {
     "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start"
+    "build": "QTUMINFO_API_BASE_CLIENT=/api/ QTUMINFO_API_BASE_SERVER=http://localhost:7001/ QTUMINFO_API_BASE_WS=//explorer3.runebase.io/ nuxt build",
+    "start": "PORT=3000 nuxt start"
   },
   "repository": {
     "type": "git",

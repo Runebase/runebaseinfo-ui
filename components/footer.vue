@@ -1,31 +1,6 @@
 <template>
   <footer>
     <div class="container">
-      <h3 class="is-size-4 is-uppercase">{{ $t('footer.contact_us') }}</h3>
-      <div class="line"></div>
-      <a href="mailto:foundation@qtum.org">foundation@qtum.org</a>
-      <ul class="links">
-        <li>
-          <a target="_blank" href="https://www.facebook.com/QtumOfficial/">
-            <Icon icon="facebook" brands /> {{ $t('footer.facebook') }}
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://twitter.com/qtumofficial">
-            <Icon icon="twitter" brands /> {{ $t('footer.twitter') }}
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://forum.qtum.org">
-            <span class="qtum-icon qtum-icon--qtum"></span> {{ $t('footer.forum') }}
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://github.com/qtumproject/qtum">
-            <Icon icon="github" brands /> Github
-          </a>
-        </li>
-      </ul>
       <div class="copyright">
         2017 - 2019 QTUM CHAIN FOUNDATION &copy; All rights Reserved
       </div>
