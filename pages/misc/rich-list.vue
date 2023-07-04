@@ -16,7 +16,7 @@
           <td>
             <AddressLink :address="address" />
           </td>
-          <td class="monospace break-word">{{ balance | qtum(8) }} QTUM</td>
+          <td class="monospace break-word">{{ balance | runebase(8) }} RUNES</td>
           <td class="monospace">{{ (balance / totalSupply * 100).toFixed(4) + '%' }}</td>
         </tr>
       </tbody>
@@ -27,7 +27,7 @@
 
 <script>
   import Misc from '@/models/misc'
-  import {RequestError} from '@/services/qtuminfo-api'
+  import {RequestError} from '@/services/runebaseinfo-api'
   import {scrollIntoView} from '@/utils/dom'
 
   export default {
@@ -72,18 +72,12 @@
       totalSupply() {
         let height = this.blockchain.height
         if (height <= 5000) {
-          return height * 20000
+          return height * 8000
         }
-        let supply = 1e16
-        let reward = 4e8
-        let interval = 985500
+        let supply = 3.99999e15
+        let reward = 100e8
         height -= 5000
-        let halvings = 0
-        while (halvings < 7 && height > interval) {
-          supply += interval * (reward >>> halvings++)
-          height -= interval
-        }
-        return supply + height * (reward >>> halvings)
+        return supply + height * reward
       },
       pages() {
         return Math.ceil(this.totalCount / 100)

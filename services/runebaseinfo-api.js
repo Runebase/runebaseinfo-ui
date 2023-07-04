@@ -8,7 +8,7 @@ export class RequestError extends ExtendableError {
   }
 }
 
-const resource = axios.create({baseURL: process.env.qtuminfoAPIBase})
+const resource = axios.create({baseURL: process.env.runebaseinfoAPIBase})
 export default resource
 
 export function request(...args) {
@@ -23,6 +23,7 @@ export async function get(url, {params, ip} = {}) {
     })
     return response.data
   } catch (err) {
+    console.log(err);
     throw new RequestError(err.response.statusText, err.response.status)
   }
 }
@@ -34,6 +35,7 @@ export async function post(url, data, {ip} = {}) {
     })
     return response.data
   } catch (err) {
+    console.log(err);
     throw new RequestError(err.response.statusText, err.response.status)
   }
 }

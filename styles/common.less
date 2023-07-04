@@ -8,13 +8,13 @@
   font-family: monospace;
 }
 
-.button.is-qtum {
+.button.is-runebase {
   border-color: transparent;
-  background-color: @qtum;
+  background-color: @runebase;
   color: white;
 
   &:hover, .is-hovered {
-    background-color: darken(@qtum, 3%);
+    background-color: darken(@runebase, 3%);
     color: white;
   }
 
@@ -22,30 +22,30 @@
     outline: none;
     color: white;
     &:not(:active) {
-      box-shadow: 0 0 0 0.125rem fade(@qtum, 25%);
+      box-shadow: 0 0 0 0.125rem fade(@runebase, 25%);
     }
   }
 
   &:active, .is-actived {
     outline: none;
-    background-color: darken(@qtum, 5%);
+    background-color: darken(@runebase, 5%);
     color: white;
   }
 
   &.is-outlined {
-    border-color: @qtum;
+    border-color: @runebase;
     background-color: transparent;
-    color: @qtum;
+    color: @runebase;
     &:hover, .is-hovered {
-      border-color: @qtum;
-      background-color: @qtum;
+      border-color: @runebase;
+      background-color: @runebase;
       color: white;
     }
   }
 
   &.is-inverted {
     background-color: white;
-    color: @qtum;
+    color: @runebase;
     &:hover, .is-hovered {
       background-color: #f2f2f2;
       color: white;
@@ -58,13 +58,13 @@
     color: white;
     &:hover {
       background-color: white;
-      color: @qtum;
+      color: @runebase;
     }
   }
 
   &[disabled] {
     border-color: transparent;
-    background-color: @qtum;
+    background-color: @runebase;
     box-shadow: none;
   }
 }

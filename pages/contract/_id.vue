@@ -46,15 +46,15 @@
         </template>
         <div class="columns">
           <div class="column info-title">{{ $t('contract.balance') }}</div>
-          <div class="column info-value monospace">{{ balance | qtum }} QTUM</div>
+          <div class="column info-value monospace">{{ balance | runebase }} RUNES</div>
         </div>
         <div class="columns">
           <div class="column info-title">{{ $t('contract.total_received') }}</div>
-          <div class="column info-value monospace">{{ totalReceived | qtum }} QTUM</div>
+          <div class="column info-value monospace">{{ totalReceived | runebase }} RUNES</div>
         </div>
         <div class="columns">
           <div class="column info-title">{{ $t('contract.total_sent') }}</div>
-          <div class="column info-value monospace">{{ totalSent | qtum }} QTUM</div>
+          <div class="column info-value monospace">{{ totalSent | runebase }} RUNES</div>
         </div>
         <div class="columns" v-if="existingTokenBalances.length">
           <div class="column info-title">{{ $t('address.token_balances') }}</div>
@@ -96,7 +96,7 @@
 
 <script>
   import Contract from '@/models/contract'
-  import {RequestError} from '@/services/qtuminfo-api'
+  import {RequestError} from '@/services/runebaseinfo-api'
 
   export default {
     head() {

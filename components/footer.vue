@@ -1,11 +1,11 @@
 <template>
-  <footer>
+  <!-- <footer>
     <div class="container">
       <div class="copyright">
         2017 - 2019 QTUM CHAIN FOUNDATION &copy; All rights Reserved
       </div>
     </div>
-  </footer>
+  </footer> -->
 </template>
 
 <style lang="less" scoped>
@@ -49,7 +49,7 @@
       margin-bottom: 2.5rem;
     }
   }
-  span.fab, span.fas, span.qtum-icon {
+  span.fab, span.fas, span.runebase-icon {
     font-size: 2em;
     vertical-align: middle;
   }
