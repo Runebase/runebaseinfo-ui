@@ -10,6 +10,7 @@ blockchain:
   current_difficulty: Current Difficulty
   network_weight: Network Weight
   fee_rate: Fee Rate
+  total_supply : Total Supply
 block:
   brief:
     address: Mined by {0}

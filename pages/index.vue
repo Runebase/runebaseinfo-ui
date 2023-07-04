@@ -28,6 +28,10 @@
               <span class="key">{{ $t('blockchain.fee_rate') }}</span>:
               <span class="value">{{ feeRate }} RUNES/kB</span>
             </p>
+            <p class="information">
+              <span class="key">{{ $t('blockchain.total_supply') }}</span>:
+              <span class="value">{{ ((blockchain.height * 100) + 39999900).toLocaleString() }}</span>
+            </p>
           </div>
         </div>
       </div>
