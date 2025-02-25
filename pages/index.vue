@@ -30,7 +30,16 @@
             </p>
             <p class="information">
               <span class="key">{{ $t('blockchain.total_supply') }}</span>:
-              <span class="value">{{ ((blockchain.height * 100) + 39999900).toLocaleString() }}</span>
+              <span class="value">
+                {{
+                  (
+                    (blockchain.height < 1310000
+                      ? blockchain.height * 100
+                      : (1310000 * 100) + ((blockchain.height - 1310000) * 25)
+                    ) + 39999900
+                  ).toLocaleString()
+                }}
+              </span>
             </p>
           </div>
         </div>
