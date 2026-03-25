@@ -3,6 +3,8 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import Address from '@/models/address'
 import TransactionModel from '@/models/transaction'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Pagination from '@/components/Pagination'
 import Transaction from '@/components/Transaction'
 
@@ -42,13 +44,13 @@ export default function AddressTransactions() {
     <div>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
       {transactions.length > 0 && (
-        <div className="card section-card transaction-list">
-          <div className="card-body">
+        <Card sx={{ mx: { xs: 0, md: '0.75em' }, my: '0.5em' }}>
+          <CardContent>
             {transactions.map(tx => (
               <Transaction key={tx.id} transaction={tx} highlightAddress={addresses} />
             ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
     </div>

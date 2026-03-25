@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
 
 export default function BlockLink({ block, plain = false, clipboard = true, children }) {
@@ -7,13 +8,20 @@ export default function BlockLink({ block, plain = false, clipboard = true, chil
   const clipboardStr = (clipboard === true ? block : clipboard).toString()
 
   return (
-    <span className="block-link">
+    <Box
+      component="span"
+      sx={{
+        position: 'relative',
+        display: 'inline',
+        '&:hover .clipboard': { opacity: 1 },
+      }}
+    >
       {plain ? (
-        <span className="break-word monospace">{display}</span>
+        <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
       ) : (
-        <Link to={`/block/${block}`} className="break-word monospace">{display}</Link>
+        <Box component={Link} to={`/block/${block}`} sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
       )}
       {clipboard && <Clipboard string={clipboardStr} />}
-    </span>
+    </Box>
   )
 }

@@ -6,6 +6,10 @@ import { formatRunebase } from '@/utils/format'
 import { toHexAddress } from '@/utils/address'
 import Address from '@/models/address'
 import MiscModel from '@/models/misc'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 
 export default function StakeCalculator() {
   const { t } = useTranslation()
@@ -52,47 +56,55 @@ export default function StakeCalculator() {
   const reward = 100e8
 
   return (
-    <form onSubmit={e => e.preventDefault()}>
-      <div className="field">
-        <label>{t('blockchain.network_weight')}</label>
-        <div className="control"><output className="monospace">{formatRunebase(netStakeWeight, 8)}</output></div>
-      </div>
-      <div className="field">
-        <label>{t('misc.stake_calculator.enter_address')}</label>
-        <div className="control">
-          <input type="text" className="input monospace" value={address} onChange={e => setAddress(e.target.value)} />
-        </div>
-      </div>
-      <div className="field">
-        <label>{t('misc.stake_calculator.weight')}</label>
-        <div className="control">
-          <input type="number" className="input monospace" value={weightInput} onChange={e => setWeightInput(e.target.value)} placeholder="0" />
-        </div>
-      </div>
-      {weight > 0 && (
-        <>
-          <div className="field">
-            <label>{t('misc.stake_calculator.expected_time')}</label>
-            <div className="control"><output>{interval}</output></div>
-          </div>
-          {expectedTime < 100000 && (
-            <div className="field">
-              <label>{t('misc.stake_calculator.average_blocks_per_day')}</label>
-              <div className="control"><output>{(86400 / expectedTime).toFixed(2)}</output></div>
-            </div>
-          )}
-          <div className="field">
-            <label>{t('misc.stake_calculator.average_blocks_per_year')}</label>
-            <div className="control"><output>{(365 * 86400 / expectedTime).toFixed(2)}</output></div>
-          </div>
-        </>
-      )}
-      <div className="field">
-        <label>{t('misc.stake_calculator.yearly_roi')}</label>
-        <div className="control">
-          <output className="monospace">{netStakeWeight ? (reward * 365 * 675 / netStakeWeight * 100).toFixed(2) : 0}%</output>
-        </div>
-      </div>
-    </form>
+    <Box component="form" onSubmit={e => e.preventDefault()}>
+      <Stack spacing={2}>
+        <Box>
+          <Typography variant="body2" fontWeight="bold" gutterBottom>{t('blockchain.network_weight')}</Typography>
+          <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>{formatRunebase(netStakeWeight, 8)}</Typography>
+        </Box>
+        <TextField
+          label={t('misc.stake_calculator.enter_address')}
+          value={address}
+          onChange={e => setAddress(e.target.value)}
+          fullWidth
+          size="small"
+          slotProps={{ input: { sx: { fontFamily: 'monospace' } } }}
+        />
+        <TextField
+          label={t('misc.stake_calculator.weight')}
+          type="number"
+          value={weightInput}
+          onChange={e => setWeightInput(e.target.value)}
+          placeholder="0"
+          fullWidth
+          size="small"
+          slotProps={{ input: { sx: { fontFamily: 'monospace' } } }}
+        />
+        {weight > 0 && (
+          <>
+            <Box>
+              <Typography variant="body2" fontWeight="bold" gutterBottom>{t('misc.stake_calculator.expected_time')}</Typography>
+              <Typography variant="body1">{interval}</Typography>
+            </Box>
+            {expectedTime < 100000 && (
+              <Box>
+                <Typography variant="body2" fontWeight="bold" gutterBottom>{t('misc.stake_calculator.average_blocks_per_day')}</Typography>
+                <Typography variant="body1">{(86400 / expectedTime).toFixed(2)}</Typography>
+              </Box>
+            )}
+            <Box>
+              <Typography variant="body2" fontWeight="bold" gutterBottom>{t('misc.stake_calculator.average_blocks_per_year')}</Typography>
+              <Typography variant="body1">{(365 * 86400 / expectedTime).toFixed(2)}</Typography>
+            </Box>
+          </>
+        )}
+        <Box>
+          <Typography variant="body2" fontWeight="bold" gutterBottom>{t('misc.stake_calculator.yearly_roi')}</Typography>
+          <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+            {netStakeWeight ? (reward * 365 * 675 / netStakeWeight * 100).toFixed(2) : 0}%
+          </Typography>
+        </Box>
+      </Stack>
+    </Box>
   )
 }

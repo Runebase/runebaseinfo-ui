@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
 import Nav from './Nav'
 import Breadcrumb from './Breadcrumb'
 import MyAddresses from './MyAddresses'
@@ -21,19 +23,19 @@ export default function Layout() {
   }, [])
 
   return (
-    <div id="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <div>
-        <header className="container">
-          <Nav />
-        </header>
-      </div>
-      <div className="background" style={{ position: 'relative', flex: 1, padding: '0.5rem 0 1rem', backgroundColor: '#f5f6f8' }}>
-        <div className="container">
-          {location.pathname !== '/' && <Breadcrumb />}
-        </div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Container maxWidth="lg" disableGutters>
+        <Nav />
+      </Container>
+      <Box sx={{ position: 'relative', flex: 1, py: 1, bgcolor: 'background.default' }}>
+        {location.pathname !== '/' && (
+          <Container maxWidth="lg">
+            <Breadcrumb />
+          </Container>
+        )}
         <Outlet />
-      </div>
+      </Box>
       <MyAddresses />
-    </div>
+    </Box>
   )
 }

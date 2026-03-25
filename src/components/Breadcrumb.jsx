@@ -1,7 +1,23 @@
 import React from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link as RouterLink, useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import Icon from './Icon'
+import MuiBreadcrumbs from '@mui/material/Breadcrumbs'
+import MuiLink from '@mui/material/Link'
+import Typography from '@mui/material/Typography'
+import HomeIcon from '@mui/icons-material/Home'
+import ViewInArIcon from '@mui/icons-material/ViewInAr'
+import ContactMailIcon from '@mui/icons-material/ContactMail'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import CodeIcon from '@mui/icons-material/Code'
+import ShowChartIcon from '@mui/icons-material/ShowChart'
+
+const iconMap = {
+  cubes: ViewInArIcon,
+  'address-card': ContactMailIcon,
+  'list-alt': ListAltIcon,
+  code: CodeIcon,
+  'chart-area': ShowChartIcon,
+}
 
 export default function Breadcrumb() {
   const { t } = useTranslation()
@@ -35,23 +51,44 @@ export default function Breadcrumb() {
   }
 
   return (
-    <div className="breadcrumb" style={{ marginLeft: '1em' }}>
-      <ul className="breadcrumb-list" style={{ display: 'flex', alignItems: 'center', listStyle: 'none', gap: '0.5em' }}>
-        <li>
-          <Link to="/"><Icon icon="home" /></Link>
-        </li>
-        {crumbs.map((crumb, i) => (
-          <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.3em' }}>
-            <span style={{ margin: '0 0.3em' }}>/</span>
-            <Link to={crumb.to} style={{ display: 'flex', alignItems: 'center', gap: '0.3em' }}>
-              {crumb.icon && <Icon icon={crumb.icon} />}
-              <span className="monospace" style={{ maxWidth: '15em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {crumb.label}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <MuiBreadcrumbs sx={{ my: 1, ml: 1 }}>
+      <MuiLink
+        component={RouterLink}
+        to="/"
+        color="inherit"
+        sx={{ display: 'flex', alignItems: 'center' }}
+      >
+        <HomeIcon fontSize="small" />
+      </MuiLink>
+      {crumbs.map((crumb, i) => {
+        const IconComp = crumb.icon ? iconMap[crumb.icon] : null
+        return (
+          <MuiLink
+            key={i}
+            component={RouterLink}
+            to={crumb.to}
+            color="inherit"
+            underline="hover"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              maxWidth: '15em',
+              fontFamily: 'monospace',
+            }}
+          >
+            {IconComp && <IconComp fontSize="small" />}
+            <Typography
+              variant="body2"
+              noWrap
+              component="span"
+              sx={{ fontFamily: 'monospace' }}
+            >
+              {crumb.label}
+            </Typography>
+          </MuiLink>
+        )
+      })}
+    </MuiBreadcrumbs>
   )
 }

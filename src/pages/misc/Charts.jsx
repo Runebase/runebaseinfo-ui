@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import MiscModel from '@/models/misc'
+import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 
 export default function Charts() {
   const { t } = useTranslation()
@@ -37,7 +39,6 @@ export default function Charts() {
 
       if (!mounted) return
 
-      // Daily Transactions
       if (dailyRef.current) {
         const chart = echarts.init(dailyRef.current)
         chart.setOption({
@@ -65,7 +66,6 @@ export default function Charts() {
         })
       }
 
-      // Block Interval
       if (intervalRef.current) {
         const chart = echarts.init(intervalRef.current)
         chart.setOption({
@@ -82,7 +82,6 @@ export default function Charts() {
         })
       }
 
-      // Address Growth
       if (growthRef.current) {
         const chart = echarts.init(growthRef.current)
         chart.setOption({
@@ -106,13 +105,14 @@ export default function Charts() {
   }, [data])
 
   const chartStyle = { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }
-  const wrapperStyle = { position: 'relative', paddingTop: '33.3%', marginTop: '1em' }
 
   return (
-    <section className="container">
-      <div style={wrapperStyle}><div ref={dailyRef} style={chartStyle}></div></div>
-      <div style={wrapperStyle}><div ref={intervalRef} style={chartStyle}></div></div>
-      <div style={wrapperStyle}><div ref={growthRef} style={chartStyle}></div></div>
-    </section>
+    <Box>
+      {[dailyRef, intervalRef, growthRef].map((ref, i) => (
+        <Paper key={i} variant="outlined" sx={{ position: 'relative', pt: '33.3%', mt: i > 0 ? 2 : 0 }}>
+          <Box ref={ref} sx={chartStyle} />
+        </Paper>
+      ))}
+    </Box>
   )
 }

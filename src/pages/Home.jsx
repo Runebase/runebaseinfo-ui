@@ -7,7 +7,15 @@ import { formatRunebase } from '@/utils/format'
 import Block from '@/models/block'
 import Transaction from '@/models/transaction'
 import Misc from '@/models/misc'
-import Icon from '@/components/Icon'
+import Container from '@mui/material/Container'
+import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
+import SpeedIcon from '@mui/icons-material/Speed'
+import ViewInArIcon from '@mui/icons-material/ViewInAr'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import SectionCard from '@/components/SectionCard'
 import FromNow from '@/components/FromNow'
 import AddressLink from '@/components/links/AddressLink'
 import TransactionLink from '@/components/links/TransactionLink'
@@ -39,7 +47,6 @@ export default function Home() {
     }).catch(() => {})
   }, [])
 
-  // Update on new block
   useEffect(() => {
     if (blockchain.height && recentBlocks.length) {
       Block.get(blockchain.height).then(block => {
@@ -58,7 +65,6 @@ export default function Home() {
     }
   }, [blockchain.height])
 
-  // WebSocket subscriptions
   useEffect(() => {
     const onMempool = (tx) => {
       setRecentTransactions(prev => {
@@ -84,99 +90,87 @@ export default function Home() {
     ? blockchain.height * 100 + 39999900
     : (1310000 * 100) + ((blockchain.height - 1310000) * 25) + 39999900
 
+  const statRows = [
+    { label: t('blockchain.blockchain_height'), value: blockchain.height.toLocaleString() },
+    { label: t('blockchain.current_difficulty'), value: difficulty.toLocaleString() },
+    { label: t('blockchain.network_weight'), value: formatRunebase(stakeWeight, 8) },
+    { label: t('blockchain.fee_rate'), value: `${feeRate} RUNES/kB` },
+    { label: t('blockchain.total_supply'), value: totalSupply.toLocaleString() },
+  ]
+
   return (
-    <div className="container">
-      <section className="columns is-multiline is-desktop" style={{ margin: 0 }}>
-        <div className="column">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-header-icon"><Icon icon="tachometer-alt" fixedWidth /></div>
-              <h3 className="card-header-title">{t('misc.network_statistics')}</h3>
-            </div>
-            <div className="card-body">
-              <p style={{ padding: '0.1em 1em' }}>
-                <span style={{ fontWeight: 'bold' }}>{t('blockchain.blockchain_height')}</span>:{' '}
-                <span className="monospace">{blockchain.height.toLocaleString()}</span>
-              </p>
-              <p style={{ padding: '0.1em 1em' }}>
-                <span style={{ fontWeight: 'bold' }}>{t('blockchain.current_difficulty')}</span>:{' '}
-                <span className="monospace">{difficulty.toLocaleString()}</span>
-              </p>
-              <p style={{ padding: '0.1em 1em' }}>
-                <span style={{ fontWeight: 'bold' }}>{t('blockchain.network_weight')}</span>:{' '}
-                <span className="monospace">{formatRunebase(stakeWeight, 8)}</span>
-              </p>
-              <p style={{ padding: '0.1em 1em' }}>
-                <span style={{ fontWeight: 'bold' }}>{t('blockchain.fee_rate')}</span>:{' '}
-                <span className="monospace">{feeRate} RUNES/kB</span>
-              </p>
-              <p style={{ padding: '0.1em 1em' }}>
-                <span style={{ fontWeight: 'bold' }}>{t('blockchain.total_supply')}</span>:{' '}
-                <span className="monospace">{totalSupply.toLocaleString()}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <Container maxWidth="lg">
+      <Grid container spacing={2}>
+        <Grid size={12}>
+          <SectionCard icon={<SpeedIcon sx={{ fontSize: 18 }} />} title={t('misc.network_statistics')}>
+            {statRows.map((row, i) => (
+              <Box key={i} sx={{ px: 1, py: 0.1 }}>
+                <Typography variant="body2" component="span" fontWeight="bold">{row.label}</Typography>
+                {': '}
+                <Typography variant="body2" component="span" sx={{ fontFamily: 'monospace' }}>{row.value}</Typography>
+              </Box>
+            ))}
+          </SectionCard>
+        </Grid>
 
-      <section className="columns is-multiline is-desktop" style={{ margin: 0 }}>
-        <div className="column is-half">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-header-icon"><Icon icon="cubes" fixedWidth /></div>
-              <h3 className="card-header-title">{t('blockchain.block_plural')}</h3>
-              <Link to="/block" className="card-header-button button is-runebase is-outlined">
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionCard
+            icon={<ViewInArIcon sx={{ fontSize: 18 }} />}
+            title={t('blockchain.block_plural')}
+            action={
+              <Button component={Link} to="/block" variant="outlined" color="primary" size="small">
                 {t('action.view_all')}
-              </Link>
-            </div>
-            <div className="card-body">
-              {recentBlocks.map(block => (
-                <div key={block.hash} className="is-size-7" style={{ padding: '1em', borderTop: '1px solid #eee' }}>
-                  <div className="level">
-                    <div className="level-left">
-                      <Link to={`/block/${block.height}`} className="level-item has-text-centered"
-                        style={{ flexDirection: 'column', minWidth: '11em', padding: '1em', backgroundColor: '#eee', color: 'inherit' }}>
-                        {t('blockchain.block')} #{block.height}
-                        <FromNow timestamp={block.timestamp} />
-                      </Link>
-                      <div className="level-item">
-                        <div>
-                          Mined by <AddressLink address={block.miner} />
-                          <br />
-                          {block.transactionCount} transactions in {block.interval} secs
-                          <br />
-                          <span className="monospace">
-                            {t('block.brief.reward')} {formatRunebase(block.reward)} RUNES
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+              </Button>
+            }
+          >
+            {recentBlocks.map(block => (
+              <Box key={block.hash} sx={{ borderTop: '1px solid', borderColor: 'divider', p: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box
+                    component={Link}
+                    to={`/block/${block.height}`}
+                    sx={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      minWidth: '11em', p: 1, bgcolor: 'grey.100', color: 'inherit',
+                      textDecoration: 'none', borderRadius: 1,
+                    }}
+                  >
+                    <Typography variant="body2">{t('blockchain.block')} #{block.height}</Typography>
+                    <Typography variant="caption" color="text.secondary"><FromNow timestamp={block.timestamp} /></Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2">
+                      Mined by <AddressLink address={block.miner} />
+                    </Typography>
+                    <Typography variant="body2">
+                      {block.transactionCount} transactions in {block.interval} secs
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                      {t('block.brief.reward')} {formatRunebase(block.reward)} RUNES
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            ))}
+          </SectionCard>
+        </Grid>
 
-        <div className="column is-half">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-header-icon"><Icon icon="list-alt" fixedWidth /></div>
-              <h3 className="card-header-title">{t('blockchain.transaction_plural')}</h3>
-            </div>
-            <div className="card-body">
-              {recentTransactions.map(tx => (
-                <div key={tx.id} className="is-size-7" style={{ padding: '0.5em 1em', borderTop: '1px solid #eee', fontFamily: 'monospace' }}>
-                  <div className="level">
-                    <TransactionLink transaction={tx.id} className="level-left" />
-                    <span className="level-right">{formatRunebase(tx.outputValue)} RUNES</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionCard
+            icon={<ListAltIcon sx={{ fontSize: 18 }} />}
+            title={t('blockchain.transaction_plural')}
+          >
+            {recentTransactions.map(tx => (
+              <Box key={tx.id} sx={{ borderTop: '1px solid', borderColor: 'divider', px: 1, py: 0.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                  <TransactionLink transaction={tx.id} />
+                  <span>{formatRunebase(tx.outputValue)} RUNES</span>
+                </Box>
+              </Box>
+            ))}
+          </SectionCard>
+        </Grid>
+      </Grid>
+    </Container>
   )
 }

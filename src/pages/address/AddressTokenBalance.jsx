@@ -4,6 +4,17 @@ import { useTranslation } from 'react-i18next'
 import { useResponsive } from '@/hooks/useResponsive'
 import { formatRrc20, formatTimestamp } from '@/utils/format'
 import Address from '@/models/address'
+import Box from '@mui/material/Box'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import Paper from '@mui/material/Paper'
 import Pagination from '@/components/Pagination'
 import TransactionLink from '@/components/links/TransactionLink'
 import AddressLink from '@/components/links/AddressLink'
@@ -40,58 +51,59 @@ export default function AddressTokenBalance() {
 
   return (
     <div>
-      <form style={{ display: 'flex', flexFlow: 'wrap', marginBottom: '1em' }} onSubmit={e => e.preventDefault()}>
-        <label className="radio" style={{ marginRight: '1em' }}>
-          <input type="radio" value="" checked={selectedToken === ''} onChange={() => onTokenChange('')} /> All
-        </label>
+      <RadioGroup row value={selectedToken} onChange={e => onTokenChange(e.target.value)} sx={{ mb: 1, flexWrap: 'wrap' }}>
+        <FormControlLabel value="" control={<Radio size="small" />} label="All" />
         {tokens.map(token => (
-          <label key={token.address} className="radio" style={{ marginRight: '1em' }}>
-            <input type="radio" value={token.address} checked={selectedToken === token.address}
-              onChange={() => onTokenChange(token.address)} />
-            {' '}{token.name} ({token.symbol})
-          </label>
+          <FormControlLabel
+            key={token.address}
+            value={token.address}
+            control={<Radio size="small" />}
+            label={`${token.name} (${token.symbol})`}
+          />
         ))}
-      </form>
+      </RadioGroup>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-      <table className="table is-fullwidth is-bordered is-striped">
-        <thead>
-          <tr>
-            <th>{t('address.timestamp')}</th>
-            <th>{t('address.transaction_id')}</th>
-            {isTablet && <th>{t('address.token_balances')}</th>}
-            {isTablet && <th>{t('address.changes')}</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map(tx => (
-            <tr key={tx.id}>
-              <td>{formatTimestamp(tx.timestamp)}</td>
-              <td><TransactionLink transaction={tx.id} /></td>
-              {isTablet && (
-                <td className="monospace">
-                  {(tx.tokens || []).map((tok, i) => (
-                    <div key={i}>
-                      {formatRrc20((tok.balance || '').replace('-', ''), tok.decimals)}{' '}
-                      <AddressLink address={tok.address}>{tok.symbol || tok.name || t('contract.token.tokens')}</AddressLink>
-                    </div>
-                  ))}
-                </td>
-              )}
-              {isTablet && (
-                <td className="monospace">
-                  {(tx.tokens || []).map((tok, i) => (
-                    <div key={i}>
-                      {tok.amount > 0 ? '+' : tok.amount < 0 ? '-' : '\u00a0'}
-                      {formatRrc20((tok.amount || '').toString().replace('-', ''), tok.decimals)}{' '}
-                      <AddressLink address={tok.address}>{tok.symbol || tok.name || t('contract.token.tokens')}</AddressLink>
-                    </div>
-                  ))}
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableContainer component={Paper} variant="outlined">
+        <Table size="small" sx={{ '& tbody tr:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>{t('address.timestamp')}</TableCell>
+              <TableCell>{t('address.transaction_id')}</TableCell>
+              {isTablet && <TableCell>{t('address.token_balances')}</TableCell>}
+              {isTablet && <TableCell>{t('address.changes')}</TableCell>}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {transactions.map(tx => (
+              <TableRow key={tx.id}>
+                <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
+                <TableCell><TransactionLink transaction={tx.id} /></TableCell>
+                {isTablet && (
+                  <TableCell sx={{ fontFamily: 'monospace' }}>
+                    {(tx.tokens || []).map((tok, i) => (
+                      <div key={i}>
+                        {formatRrc20((tok.balance || '').replace('-', ''), tok.decimals)}{' '}
+                        <AddressLink address={tok.address}>{tok.symbol || tok.name || t('contract.token.tokens')}</AddressLink>
+                      </div>
+                    ))}
+                  </TableCell>
+                )}
+                {isTablet && (
+                  <TableCell sx={{ fontFamily: 'monospace' }}>
+                    {(tx.tokens || []).map((tok, i) => (
+                      <div key={i}>
+                        {tok.amount > 0 ? '+' : tok.amount < 0 ? '-' : '\u00a0'}
+                        {formatRrc20((tok.amount || '').toString().replace('-', ''), tok.decimals)}{' '}
+                        <AddressLink address={tok.address}>{tok.symbol || tok.name || t('contract.token.tokens')}</AddressLink>
+                      </div>
+                    ))}
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
     </div>
   )

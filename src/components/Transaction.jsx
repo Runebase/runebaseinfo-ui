@@ -5,7 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { formatRunebase, formatRrc20, formatTimestamp } from '@/utils/format'
 import TransactionModel from '@/models/transaction'
-import Icon from './Icon'
+import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
+import Chip from '@mui/material/Chip'
+import IconButton from '@mui/material/IconButton'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import SearchIcon from '@mui/icons-material/Search'
 import AddressLink from './links/AddressLink'
 import BlockLink from './links/BlockLink'
 import TransactionLink from './links/TransactionLink'
@@ -88,204 +95,201 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       }).join(',\n') + '\n)'
   }
 
+  const arrowColumn = (
+    <Grid size="auto" sx={{ display: 'flex', alignItems: 'center', px: 1 }}>
+      <ArrowForwardIcon fontSize="small" color="action" />
+    </Grid>
+  )
+
+  function renderTransferRow(key, inputContent, outputContent) {
+    return (
+      <React.Fragment key={key}>
+        <Grid size={12} sx={{ p: 0 }} />
+        <Grid size="grow">{inputContent}</Grid>
+        {arrowColumn}
+        <Grid size={{ xs: 12, md: 6 }}>{outputContent}</Grid>
+      </React.Fragment>
+    )
+  }
+
   return (
-    <div className="columns is-multiline transaction-item" style={{ paddingLeft: '0.75em', paddingRight: '0.75em', borderTop: '1px solid #ccc' }}>
-      <div className="column is-full is-clearfix">
-        <div className="is-pulled-left" style={{ paddingBottom: '0.25em' }}>
-          {detailed && (
-            <Icon
-              icon={collapsed ? 'chevron-right' : 'chevron-down'}
-              fixedWidth
-              style={{ cursor: 'pointer' }}
-              onClick={() => setCollapsed(!collapsed)}
-            />
-          )}
-          <TransactionLink transaction={id} />
-        </div>
-        <div className="is-pulled-right">
-          {confirmations ? (
-            <Link
-              to={`/block/${blockHeight}`}
-              className={`tag ${confirmations >= 10 ? 'is-success' : ''}`}
-              style={{ textDecoration: 'none', marginLeft: '1em' }}
-            >
-              {confirmations} {confirmations === 1 ? t('transaction.confirmations') : t('transaction.confirmations_plural')}
-            </Link>
-          ) : (
-            <span className="tag is-danger" style={{ marginLeft: '1em' }}>{t('transaction.unconfirmed')}</span>
-          )}
-          {timestamp && <span style={{ marginLeft: '1em' }}>{formatTimestamp(timestamp)}</span>}
-        </div>
-      </div>
+    <Grid container sx={{ px: 1, borderTop: '1px solid', borderColor: 'divider', py: 0.5 }}>
+      {/* Header: tx link + confirmations */}
+      <Grid size={12}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', pb: 0.25 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {detailed && (
+              <IconButton size="small" onClick={() => setCollapsed(!collapsed)} sx={{ p: 0 }}>
+                {collapsed ? <ChevronRightIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+              </IconButton>
+            )}
+            <TransactionLink transaction={id} />
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {confirmations ? (
+              <Chip
+                component={Link}
+                to={`/block/${blockHeight}`}
+                label={`${confirmations} ${confirmations === 1 ? t('transaction.confirmations') : t('transaction.confirmations_plural')}`}
+                size="small"
+                color={confirmations >= 10 ? 'success' : 'default'}
+                clickable
+                sx={{ textDecoration: 'none' }}
+              />
+            ) : (
+              <Chip label={t('transaction.unconfirmed')} size="small" color="error" />
+            )}
+            {timestamp && (
+              <Box component="span" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                {formatTimestamp(timestamp)}
+              </Box>
+            )}
+          </Box>
+        </Box>
+      </Grid>
 
       {/* Inputs */}
-      <div className="column is-clearfix">
+      <Grid size="grow">
         {inputs.map((input, i) => (
-          <div key={i} className="is-clearfix">
+          <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             {input.coinbase ? (
-              <span className="is-pulled-left">{t('transaction.coinbase_input')}</span>
+              <span>{t('transaction.coinbase_input')}</span>
             ) : (
               <>
                 {input.address ? (
-                  <AddressLink address={input.address} className="is-pulled-left"
+                  <AddressLink address={input.address}
                     plain={input.isInvalidContract} highlight={highlightAddress} clipboard={false} />
                 ) : (
-                  <span className="is-pulled-left">{t('transaction.unparsed_address')}</span>
+                  <span>{t('transaction.unparsed_address')}</span>
                 )}
-                <span className="is-pulled-right" style={{ fontFamily: 'monospace' }}>
+                <Box component="span" sx={{ fontFamily: 'monospace' }}>
                   <TransactionLink transaction={input.prevTxId} clipboard={false}>
-                    <Icon icon="search" />
+                    <SearchIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle' }} />
                   </TransactionLink>
                   {' '}{formatRunebase(input.value, 8)} RUNES
-                </span>
+                </Box>
               </>
             )}
-          </div>
+          </Box>
         ))}
-      </div>
+      </Grid>
 
-      <Icon icon="arrow-right" className="column" style={{ flex: 0, lineHeight: '1.5em' }} />
+      {arrowColumn}
 
       {/* Outputs */}
-      <div className="column is-half">
+      <Grid size={{ xs: 12, md: 6 }}>
         {outputs.map((output, index) => (
-          <div key={index} className="is-clearfix">
+          <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             {output.address ? (
-              <AddressLink address={output.address} className="is-pulled-left"
+              <AddressLink address={output.address}
                 plain={output.isInvalidContract} highlight={highlightAddress} clipboard={false} />
             ) : output.scriptPubKey.type === 'empty' ? (
               <span>{t('transaction.empty_output')}</span>
             ) : output.scriptPubKey.type === 'nulldata' ? (
               <span>{t('transaction.op_return_output')}</span>
             ) : (
-              <span className="is-pulled-left">{t('transaction.unparsed_address')}</span>
+              <span>{t('transaction.unparsed_address')}</span>
             )}
             {output.value !== '0' && (
-              <span className="is-pulled-right" style={{ fontFamily: 'monospace' }}>
+              <Box component="span" sx={{ fontFamily: 'monospace' }}>
                 {output.spentTxId && (
                   <TransactionLink transaction={output.spentTxId} clipboard={false}>
-                    <Icon icon="search" />
+                    <SearchIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle' }} />
                   </TransactionLink>
                 )}
                 {' '}{formatRunebase(output.value, 8)} RUNES
-              </span>
+              </Box>
             )}
             {output.value === '0' && contractInfo[index] && (
-              <span className="is-pulled-right">
+              <Box component="span">
                 {t('transaction.script.contract_' + contractInfo[index].type)}
-              </span>
+              </Box>
             )}
-          </div>
+          </Box>
         ))}
-      </div>
+      </Grid>
 
       {/* Gas Refund */}
-      {refundValue !== '0' && (
-        <>
-          <div className="column is-full" style={{ padding: 0 }}></div>
-          <div className="column is-clearfix">{t('transaction.gas_refund')}</div>
-          <Icon icon="arrow-right" className="column" style={{ flex: 0, lineHeight: '1.5em' }} />
-          <div className="column is-half">
-            <div className="is-clearfix">
-              <AddressLink address={inputs[0].address} className="is-pulled-left" highlight={highlightAddress} clipboard={false} />
-              <span className="is-pulled-right break-word" style={{ fontFamily: 'monospace' }}>
-                {formatRunebase(refundValue, 8)} RUNES
-              </span>
-            </div>
-          </div>
-        </>
+      {refundValue !== '0' && renderTransferRow(
+        'refund',
+        <span>{t('transaction.gas_refund')}</span>,
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <AddressLink address={inputs[0].address} highlight={highlightAddress} clipboard={false} />
+          <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+            {formatRunebase(refundValue, 8)} RUNES
+          </Box>
+        </Box>
       )}
 
       {/* Contract Spends */}
-      {contractSpends.map((spend, i) => (
-        <React.Fragment key={'cs-' + i}>
-          <div className="column is-full" style={{ padding: 0 }}></div>
-          <div className="column is-clearfix">
-            {spend.inputs.map((input, j) => (
-              <div key={j} className="is-clearfix">
-                <AddressLink address={input.address} className="is-pulled-left" highlight={highlightAddress} clipboard={false} />
-                <span className="is-pulled-right" style={{ fontFamily: 'monospace' }}>
-                  {formatRunebase(input.value, 8)} RUNES
-                </span>
-              </div>
-            ))}
-          </div>
-          <Icon icon="arrow-right" className="column" style={{ flex: 0, lineHeight: '1.5em' }} />
-          <div className="column is-half">
-            {spend.outputs.map((output, j) => (
-              <div key={j} className="is-clearfix">
-                <AddressLink address={output.address} className="is-pulled-left" highlight={highlightAddress} clipboard={false} />
-                <span className="is-pulled-right" style={{ fontFamily: 'monospace' }}>
-                  {formatRunebase(output.value, 8)} RUNES
-                </span>
-              </div>
-            ))}
-          </div>
-        </React.Fragment>
+      {contractSpends.map((spend, i) => renderTransferRow(
+        'cs-' + i,
+        spend.inputs.map((input, j) => (
+          <Box key={j} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <AddressLink address={input.address} highlight={highlightAddress} clipboard={false} />
+            <Box component="span" sx={{ fontFamily: 'monospace' }}>
+              {formatRunebase(input.value, 8)} RUNES
+            </Box>
+          </Box>
+        )),
+        spend.outputs.map((output, j) => (
+          <Box key={j} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <AddressLink address={output.address} highlight={highlightAddress} clipboard={false} />
+            <Box component="span" sx={{ fontFamily: 'monospace' }}>
+              {formatRunebase(output.value, 8)} RUNES
+            </Box>
+          </Box>
+        ))
       ))}
 
       {/* RRC20 Token Transfers */}
-      {qrc20TokenTransfers.map((transfer, i) => (
-        <React.Fragment key={'qrc20-' + i}>
-          <div className="column is-full" style={{ padding: 0 }}></div>
-          <div className="column is-clearfix">
-            {transfer.from ? (
-              <AddressLink address={transfer.from} className="is-pulled-left" highlight={highlightAddress} />
-            ) : t('contract.token.mint_tokens')}
-          </div>
-          <Icon icon="arrow-right" className="column" style={{ flex: 0, lineHeight: '1.5em' }} />
-          <div className="column is-half">
-            {transfer.to ? (
-              <div className="is-clearfix">
-                <AddressLink address={transfer.to} className="is-pulled-left" highlight={highlightAddress} />
-                <span className="is-pulled-right break-word" style={{ fontFamily: 'monospace' }}>
-                  {formatRrc20(transfer.value, transfer.decimals)}{' '}
-                  <AddressLink address={transfer.address} highlight={highlightAddress}>
-                    {transfer.symbol || transfer.name || t('contract.token.tokens')}
-                  </AddressLink>
-                </span>
-              </div>
-            ) : t('contract.token.burn_tokens')}
-          </div>
-        </React.Fragment>
+      {qrc20TokenTransfers.map((transfer, i) => renderTransferRow(
+        'qrc20-' + i,
+        transfer.from ? (
+          <AddressLink address={transfer.from} highlight={highlightAddress} />
+        ) : t('contract.token.mint_tokens'),
+        transfer.to ? (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <AddressLink address={transfer.to} highlight={highlightAddress} />
+            <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              {formatRrc20(transfer.value, transfer.decimals)}{' '}
+              <AddressLink address={transfer.address} highlight={highlightAddress}>
+                {transfer.symbol || transfer.name || t('contract.token.tokens')}
+              </AddressLink>
+            </Box>
+          </Box>
+        ) : t('contract.token.burn_tokens')
       ))}
 
       {/* RRC721 Token Transfers */}
-      {qrc721TokenTransfers.map((transfer, i) => (
-        <React.Fragment key={'qrc721-' + i}>
-          <div className="column is-full" style={{ padding: 0 }}></div>
-          <div className="column is-clearfix">
-            {transfer.from ? (
-              <AddressLink address={transfer.from} className="is-pulled-left" highlight={highlightAddress} />
-            ) : t('contract.token.mint_tokens')}
-          </div>
-          <Icon icon="arrow-right" className="column" style={{ flex: 0, lineHeight: '1.5em' }} />
-          <div className="column is-half">
-            {transfer.to ? (
-              <div className="is-clearfix">
-                <AddressLink address={transfer.to} className="is-pulled-left" highlight={highlightAddress} />
-                <span className="is-pulled-right break-word" style={{ fontFamily: 'monospace' }}>
-                  <AddressLink address={transfer.address} highlight={highlightAddress}>
-                    {transfer.symbol || transfer.name || t('contract.token.tokens')}
-                  </AddressLink>
-                  {' '}#0x{transfer.tokenId.replace(/^0+/, '') || '0'}
-                </span>
-              </div>
-            ) : t('contract.token.burn_tokens')}
-          </div>
-        </React.Fragment>
+      {qrc721TokenTransfers.map((transfer, i) => renderTransferRow(
+        'qrc721-' + i,
+        transfer.from ? (
+          <AddressLink address={transfer.from} highlight={highlightAddress} />
+        ) : t('contract.token.mint_tokens'),
+        transfer.to ? (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <AddressLink address={transfer.to} highlight={highlightAddress} />
+            <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              <AddressLink address={transfer.address} highlight={highlightAddress}>
+                {transfer.symbol || transfer.name || t('contract.token.tokens')}
+              </AddressLink>
+              {' '}#0x{transfer.tokenId.replace(/^0+/, '') || '0'}
+            </Box>
+          </Box>
+        ) : t('contract.token.burn_tokens')
       ))}
 
       {/* Fees */}
       {fees !== '0' && (
-        <div className="column is-full has-text-right" style={{ paddingBottom: '0.25em' }}>
+        <Grid size={12} sx={{ textAlign: 'right', pb: 0.25 }}>
           {fees > 0 ? (
-            <>{t('transaction.fee')} <span style={{ fontFamily: 'monospace', marginLeft: '0.5em' }}>{formatRunebase(fees)} RUNES</span></>
+            <>{t('transaction.fee')} <Box component="span" sx={{ fontFamily: 'monospace', ml: 0.5 }}>{formatRunebase(fees)} RUNES</Box></>
           ) : fees < 0 ? (
-            <>{t('transaction.reward')} <span style={{ fontFamily: 'monospace', marginLeft: '0.5em' }}>{formatRunebase(-fees)} RUNES</span></>
+            <>{t('transaction.reward')} <Box component="span" sx={{ fontFamily: 'monospace', ml: 0.5 }}>{formatRunebase(-fees)} RUNES</Box></>
           ) : null}
-        </div>
+        </Grid>
       )}
-    </div>
+    </Grid>
   )
 }

@@ -4,6 +4,13 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { formatRunebase } from '@/utils/format'
 import MiscModel from '@/models/misc'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import Paper from '@mui/material/Paper'
 import Pagination from '@/components/Pagination'
 import AddressLink from '@/components/links/AddressLink'
 
@@ -33,29 +40,31 @@ export default function RichList() {
   function getLink(page) { return `/misc/rich-list?page=${page}` }
 
   return (
-    <section className="container">
+    <div>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-      <table className="table is-fullwidth is-bordered is-striped" style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
-        <thead>
-          <tr>
-            <th>{t('misc.ranking')}</th>
-            <th>{t('misc.address')}</th>
-            <th>{t('misc.balance')}</th>
-            <th>{t('misc.percentage')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.map(({ address, balance }, index) => (
-            <tr key={address}>
-              <td>{100 * (currentPage - 1) + index + 1}</td>
-              <td><AddressLink address={address} /></td>
-              <td className="monospace break-word">{formatRunebase(balance, 8)} RUNES</td>
-              <td className="monospace">{(balance / totalSupply * 100).toFixed(4)}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableContainer component={Paper} variant="outlined" sx={{ my: 0.5 }}>
+        <Table size="small" sx={{ '& tbody tr:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>{t('misc.ranking')}</TableCell>
+              <TableCell>{t('misc.address')}</TableCell>
+              <TableCell>{t('misc.balance')}</TableCell>
+              <TableCell>{t('misc.percentage')}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {list.map(({ address, balance }, index) => (
+              <TableRow key={address}>
+                <TableCell>{100 * (currentPage - 1) + index + 1}</TableCell>
+                <TableCell><AddressLink address={address} /></TableCell>
+                <TableCell sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{formatRunebase(balance, 8)} RUNES</TableCell>
+                <TableCell sx={{ fontFamily: 'monospace' }}>{(balance / totalSupply * 100).toFixed(4)}%</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-    </section>
+    </div>
   )
 }

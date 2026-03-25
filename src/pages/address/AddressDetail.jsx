@@ -5,7 +5,17 @@ import { useTranslation } from 'react-i18next'
 import { formatRunebase, formatRrc20 } from '@/utils/format'
 import Address from '@/models/address'
 import { addAddress, removeAddress } from '@/store/addressSlice'
-import Icon from '@/components/Icon'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import ContactMailIcon from '@mui/icons-material/ContactMail'
+import SectionCard from '@/components/SectionCard'
+import InfoRow from '@/components/InfoRow'
 import AddressLink from '@/components/links/AddressLink'
 
 export default function AddressDetail() {
@@ -23,107 +33,74 @@ export default function AddressDetail() {
     Address.get(id).then(setData).catch(() => {})
   }, [id])
 
-  if (!data) return <div className="container">Loading...</div>
+  if (!data) return <Container maxWidth="lg"><Typography>Loading...</Typography></Container>
 
   const existingTokenBalances = (data.qrc20Balances || []).filter(t => t.balance !== '0')
 
+  let tabValue = 0
+  if (location.pathname.includes('/balance')) tabValue = 1
+  else if (location.pathname.includes('/token-balance')) tabValue = 2
+
   return (
-    <section className="container">
-      <div className="card section-card">
-        <div className="card-header">
-          <div className="card-header-icon"><Icon icon="address-card" regular fixedWidth /></div>
-          <h3 className="card-header-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{t('address.summary')}</span>
-            {addresses.length === 1 && (
-              <span>
-                {myAddresses.includes(addresses[0]) ? (
-                  <a href="#" onClick={e => { e.preventDefault(); dispatch(removeAddress(addresses[0])) }}>
-                    <Icon icon="heart" solid fixedWidth title={t('my_addresses.unstar')} />
-                  </a>
-                ) : (
-                  <a href="#" onClick={e => { e.preventDefault(); dispatch(addAddress(addresses[0])) }}>
-                    <Icon icon="heart" regular fixedWidth title={t('my_addresses.star')} />
-                  </a>
-                )}
-              </span>
-            )}
-          </h3>
-        </div>
-        <div className="card-body info-table">
-          <div className="columns">
-            <div className="column info-title">{t('address.address')}</div>
-            <div className="column info-value">
-              {addresses.map(addr => <div key={addr}><AddressLink address={addr} plain={addresses.length === 1} /></div>)}
-            </div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('address.balance')}</div>
-            <div className="column info-value monospace">
-              {formatRunebase(data.balance)} RUNES
-              {data.unconfirmed !== '0' && <span> ({formatRunebase(data.unconfirmed)} RUNES {t('address.unconfirmed')})</span>}
-              {data.staking !== '0' && <span> ({formatRunebase(data.staking)} RUNES {t('address.staking')})</span>}
-            </div>
-          </div>
-          {data.ranking > 0 && (
-            <div className="columns">
-              <div className="column info-title">{t('misc.ranking')}</div>
-              <div className="column info-value">{data.ranking}</div>
-            </div>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('address.total_received')}</div>
-            <div className="column info-value monospace">{formatRunebase(data.totalReceived)} RUNES</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('address.total_sent')}</div>
-            <div className="column info-value monospace">{formatRunebase(data.totalSent)} RUNES</div>
-          </div>
-          {existingTokenBalances.length > 0 && (
-            <div className="columns">
-              <div className="column info-title">{t('address.token_balances')}</div>
-              <div className="column info-value">
-                {existingTokenBalances.map(token => (
-                  <div key={token.address} className="monospace">
-                    {formatRrc20(token.balance, token.decimals)}{' '}
-                    <AddressLink address={token.address}>{token.symbol || t('contract.token.tokens')}</AddressLink>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {data.blocksMined > 0 && (
-            <div className="columns">
-              <div className="column info-title">{t('address.blocks_mined')}</div>
-              <div className="column info-value">{data.blocksMined}</div>
-            </div>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('address.transaction_count')}</div>
-            <div className="column info-value">{data.transactionCount}</div>
-          </div>
-        </div>
-      </div>
+    <Container maxWidth="lg">
+      <SectionCard
+        icon={<ContactMailIcon sx={{ fontSize: 18 }} />}
+        title={t('address.summary')}
+        action={addresses.length === 1 ? (
+          myAddresses.includes(addresses[0]) ? (
+            <IconButton color="error" onClick={() => dispatch(removeAddress(addresses[0]))} title={t('my_addresses.unstar')}>
+              <FavoriteIcon />
+            </IconButton>
+          ) : (
+            <IconButton onClick={() => dispatch(addAddress(addresses[0]))} title={t('my_addresses.star')}>
+              <FavoriteBorderIcon />
+            </IconButton>
+          )
+        ) : undefined}
+      >
+        <InfoRow title={t('address.address')}>
+          {addresses.map(addr => <div key={addr}><AddressLink address={addr} plain={addresses.length === 1} /></div>)}
+        </InfoRow>
+        <InfoRow title={t('address.balance')}>
+          <Box component="span" sx={{ fontFamily: 'monospace' }}>
+            {formatRunebase(data.balance)} RUNES
+            {data.unconfirmed !== '0' && <span> ({formatRunebase(data.unconfirmed)} RUNES {t('address.unconfirmed')})</span>}
+            {data.staking !== '0' && <span> ({formatRunebase(data.staking)} RUNES {t('address.staking')})</span>}
+          </Box>
+        </InfoRow>
+        {data.ranking > 0 && <InfoRow title={t('misc.ranking')}>{data.ranking}</InfoRow>}
+        <InfoRow title={t('address.total_received')}>
+          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.totalReceived)} RUNES</Box>
+        </InfoRow>
+        <InfoRow title={t('address.total_sent')}>
+          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.totalSent)} RUNES</Box>
+        </InfoRow>
+        {existingTokenBalances.length > 0 && (
+          <InfoRow title={t('address.token_balances')}>
+            {existingTokenBalances.map(token => (
+              <Box key={token.address} sx={{ fontFamily: 'monospace' }}>
+                {formatRrc20(token.balance, token.decimals)}{' '}
+                <AddressLink address={token.address}>{token.symbol || t('contract.token.tokens')}</AddressLink>
+              </Box>
+            ))}
+          </InfoRow>
+        )}
+        {data.blocksMined > 0 && <InfoRow title={t('address.blocks_mined')}>{data.blocksMined}</InfoRow>}
+        <InfoRow title={t('address.transaction_count')}>{data.transactionCount}</InfoRow>
+      </SectionCard>
 
       {data.transactionCount > 0 && (
-        <div className="tabs is-centered">
-          <ul>
-            <li className={location.pathname === `/address/${id}` || location.pathname === `/address/${id}/` ? 'is-active' : ''}>
-              <Link to={`/address/${id}`}>{t('address.transaction_list')}</Link>
-            </li>
-            {data.totalReceived !== '0' && (
-              <li className={location.pathname.includes('/balance') ? 'is-active' : ''}>
-                <Link to={`/address/${id}/balance`}>{t('address.balance_changes')}</Link>
-              </li>
-            )}
-            {(data.qrc20Balances || []).length > 0 && (
-              <li className={location.pathname.includes('/token-balance') ? 'is-active' : ''}>
-                <Link to={`/address/${id}/token-balance`}>{t('address.token_balance_changes')}</Link>
-              </li>
-            )}
-          </ul>
-        </div>
+        <Tabs value={tabValue} centered sx={{ mb: 2 }}>
+          <Tab label={t('address.transaction_list')} component={Link} to={`/address/${id}`} />
+          {data.totalReceived !== '0' && (
+            <Tab label={t('address.balance_changes')} component={Link} to={`/address/${id}/balance`} />
+          )}
+          {(data.qrc20Balances || []).length > 0 && (
+            <Tab label={t('address.token_balance_changes')} component={Link} to={`/address/${id}/token-balance`} />
+          )}
+        </Tabs>
       )}
       <Outlet context={{ tokens: (data.qrc20Balances || []).map(({ address, name, symbol }) => ({ address, name, symbol })) }} />
-    </section>
+    </Container>
   )
 }

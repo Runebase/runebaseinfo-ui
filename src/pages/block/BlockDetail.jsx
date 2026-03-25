@@ -4,7 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { formatRunebase, formatTimestamp } from '@/utils/format'
 import BlockModel from '@/models/block'
 import TransactionModel from '@/models/transaction'
-import Icon from '@/components/Icon'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import ViewInArIcon from '@mui/icons-material/ViewInAr'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import SectionCard from '@/components/SectionCard'
+import InfoRow from '@/components/InfoRow'
 import FromNow from '@/components/FromNow'
 import Pagination from '@/components/Pagination'
 import Transaction from '@/components/Transaction'
@@ -32,7 +37,7 @@ export default function BlockDetail() {
     }).catch(() => {})
   }, [id, currentPage])
 
-  if (!block) return <div className="container">Loading...</div>
+  if (!block) return <Container maxWidth="lg"><Typography>Loading...</Typography></Container>
 
   const pages = Math.ceil(block.transactions.length / 20)
 
@@ -41,85 +46,41 @@ export default function BlockDetail() {
   }
 
   return (
-    <section className="container">
-      <div className="card section-card">
-        <div className="card-header">
-          <div className="card-header-icon"><Icon icon="cubes" fixedWidth /></div>
-          <h3 className="card-header-title">{t('block.summary')}</h3>
-        </div>
-        <div className="card-body info-table">
-          <div className="columns">
-            <div className="column info-title">{t('block.block_height')}</div>
-            <div className="column info-value">{block.height}</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.block_hash')}</div>
-            <div className="column info-value"><BlockLink block={block.hash} plain /></div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.block_size')}</div>
-            <div className="column info-value">{block.size.toLocaleString()} {t('block.bytes')}</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.block_weight')}</div>
-            <div className="column info-value">{(block.weight || 0).toLocaleString()} {t('block.bytes')}</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.timestamp')}</div>
-            <div className="column info-value"><FromNow timestamp={block.timestamp} /> ({formatTimestamp(block.timestamp)})</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.block_reward')}</div>
-            <div className="column info-value monospace">{formatRunebase(block.reward)} RUNES</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.difficulty')}</div>
-            <div className="column info-value">{block.difficulty}</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('block.merkle_root')}</div>
-            <div className="column info-value monospace">{block.merkleRoot}</div>
-          </div>
-          {block.miner && (
-            <div className="columns">
-              <div className="column info-title">{t('block.mined_by')}</div>
-              <div className="column info-value"><AddressLink address={block.miner} /></div>
-            </div>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('block.transactions')}</div>
-            <div className="column info-value">{block.transactions.length}</div>
-          </div>
-          {block.prevHash && block.prevHash !== '0'.repeat(64) && (
-            <div className="columns">
-              <div className="column info-title">{t('block.previous_block')}</div>
-              <div className="column info-value">
-                <BlockLink block={block.height - 1} clipboard={block.prevHash}>{block.prevHash}</BlockLink>
-              </div>
-            </div>
-          )}
-          {block.nextHash && (
-            <div className="columns">
-              <div className="column info-title">{t('block.next_block')}</div>
-              <div className="column info-value">
-                <BlockLink block={block.height + 1} clipboard={block.nextHash}>{block.nextHash}</BlockLink>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+    <Container maxWidth="lg">
+      <SectionCard icon={<ViewInArIcon sx={{ fontSize: 18 }} />} title={t('block.summary')}>
+        <InfoRow title={t('block.block_height')}>{block.height}</InfoRow>
+        <InfoRow title={t('block.block_hash')}><BlockLink block={block.hash} plain /></InfoRow>
+        <InfoRow title={t('block.block_size')}>{block.size.toLocaleString()} {t('block.bytes')}</InfoRow>
+        <InfoRow title={t('block.block_weight')}>{(block.weight || 0).toLocaleString()} {t('block.bytes')}</InfoRow>
+        <InfoRow title={t('block.timestamp')}><FromNow timestamp={block.timestamp} /> ({formatTimestamp(block.timestamp)})</InfoRow>
+        <InfoRow title={t('block.block_reward')}>
+          <span style={{ fontFamily: 'monospace' }}>{formatRunebase(block.reward)} RUNES</span>
+        </InfoRow>
+        <InfoRow title={t('block.difficulty')}>{block.difficulty}</InfoRow>
+        <InfoRow title={t('block.merkle_root')}>
+          <span style={{ fontFamily: 'monospace' }}>{block.merkleRoot}</span>
+        </InfoRow>
+        {block.miner && (
+          <InfoRow title={t('block.mined_by')}><AddressLink address={block.miner} /></InfoRow>
+        )}
+        <InfoRow title={t('block.transactions')}>{block.transactions.length}</InfoRow>
+        {block.prevHash && block.prevHash !== '0'.repeat(64) && (
+          <InfoRow title={t('block.previous_block')}>
+            <BlockLink block={block.height - 1} clipboard={block.prevHash}>{block.prevHash}</BlockLink>
+          </InfoRow>
+        )}
+        {block.nextHash && (
+          <InfoRow title={t('block.next_block')}>
+            <BlockLink block={block.height + 1} clipboard={block.nextHash}>{block.nextHash}</BlockLink>
+          </InfoRow>
+        )}
+      </SectionCard>
 
-      <div className="card section-card transaction-list">
-        <div className="card-header">
-          <div className="card-header-icon"><Icon icon="list-alt" fixedWidth /></div>
-          <div className="card-header-title">{t('blockchain.transaction_plural')}</div>
-        </div>
-        <div className="card-body">
-          {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-          {transactions.map(tx => <Transaction key={tx.id} transaction={tx} />)}
-          {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-        </div>
-      </div>
-    </section>
+      <SectionCard icon={<ListAltIcon sx={{ fontSize: 18 }} />} title={t('blockchain.transaction_plural')}>
+        {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
+        {transactions.map(tx => <Transaction key={tx.id} transaction={tx} />)}
+        {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
+      </SectionCard>
+    </Container>
   )
 }

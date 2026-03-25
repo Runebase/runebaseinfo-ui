@@ -5,7 +5,17 @@ import { removeAddress, addAddress } from '@/store/addressSlice'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { formatRunebase } from '@/utils/format'
 import AddressModel from '@/models/address'
-import Icon from './Icon'
+import Box from '@mui/material/Box'
+import Fab from '@mui/material/Fab'
+import Paper from '@mui/material/Paper'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import TableFooter from '@mui/material/TableFooter'
+import IconButton from '@mui/material/IconButton'
+import ContactsIcon from '@mui/icons-material/Contacts'
+import DeleteIcon from '@mui/icons-material/Delete'
 import AddressLink from './links/AddressLink'
 
 export default function MyAddresses() {
@@ -73,46 +83,57 @@ export default function MyAddresses() {
   if (!addresses.length) return null
 
   return (
-    <div ref={elRef} style={{
-      position: 'fixed', zIndex: 100, bottom: '2em', right: '2em'
-    }}>
-      <button className="button is-runebase" onClick={() => setShow(!show)}>
-        <Icon icon="address-book" regular />
-      </button>
+    <Box ref={elRef} sx={{ position: 'fixed', zIndex: 100, bottom: '2em', right: '2em' }}>
+      <Fab color="primary" size="medium" onClick={() => setShow(!show)}>
+        <ContactsIcon />
+      </Fab>
       {show && (
-        <table style={{
-          position: 'absolute', bottom: 'calc(100% + 0.5rem)', right: 0,
-          width: 'max-content', maxWidth: '90vw',
-          border: '1px solid #666', backgroundColor: 'white'
-        }}>
-          <tbody>
-            {list.map(({ address, balance }) => (
-              <tr key={address}>
-                <td style={{ padding: '2px' }}>
-                  <AddressLink address={address} onClick={() => setShow(false)} />
-                </td>
-                <td className="monospace has-text-right" style={{ padding: '2px' }}>{formatRunebase(balance, 8)}</td>
-                <td style={{ padding: '2px' }}>
-                  <Icon icon="trash" onClick={() => dispatch(removeAddress(address))} style={{ cursor: 'pointer' }} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          {addresses.length > 1 && (
-            <tfoot>
-              <tr>
-                <td style={{ padding: '2px' }}>
-                  <AddressLink address={list.map(item => item.address).join(',')} clipboard={false} onClick={() => setShow(false)}>
-                    {t('my_addresses.summary')}
-                  </AddressLink>
-                </td>
-                <td className="monospace has-text-right" style={{ padding: '2px' }}>{formatRunebase(totalBalance, 8)}</td>
-                <td></td>
-              </tr>
-            </tfoot>
-          )}
-        </table>
+        <Paper
+          elevation={4}
+          sx={{
+            position: 'absolute',
+            bottom: 'calc(100% + 0.5rem)',
+            right: 0,
+            width: 'max-content',
+            maxWidth: '90vw',
+          }}
+        >
+          <Table size="small">
+            <TableBody>
+              {list.map(({ address, balance }) => (
+                <TableRow key={address}>
+                  <TableCell sx={{ p: 0.5 }}>
+                    <AddressLink address={address} onClick={() => setShow(false)} />
+                  </TableCell>
+                  <TableCell align="right" sx={{ p: 0.5, fontFamily: 'monospace' }}>
+                    {formatRunebase(balance, 8)}
+                  </TableCell>
+                  <TableCell sx={{ p: 0.5 }}>
+                    <IconButton size="small" onClick={() => dispatch(removeAddress(address))}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+            {addresses.length > 1 && (
+              <TableFooter>
+                <TableRow>
+                  <TableCell sx={{ p: 0.5 }}>
+                    <AddressLink address={list.map(item => item.address).join(',')} clipboard={false} onClick={() => setShow(false)}>
+                      {t('my_addresses.summary')}
+                    </AddressLink>
+                  </TableCell>
+                  <TableCell align="right" sx={{ p: 0.5, fontFamily: 'monospace' }}>
+                    {formatRunebase(totalBalance, 8)}
+                  </TableCell>
+                  <TableCell />
+                </TableRow>
+              </TableFooter>
+            )}
+          </Table>
+        </Paper>
       )}
-    </div>
+    </Box>
   )
 }

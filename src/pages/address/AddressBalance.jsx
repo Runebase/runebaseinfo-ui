@@ -4,6 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { useResponsive } from '@/hooks/useResponsive'
 import { formatRunebase, formatTimestamp } from '@/utils/format'
 import Address from '@/models/address'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import Paper from '@mui/material/Paper'
 import Pagination from '@/components/Pagination'
 import TransactionLink from '@/components/links/TransactionLink'
 
@@ -28,49 +35,51 @@ export default function AddressBalance() {
   return (
     <div>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-      <table className="table is-fullwidth is-bordered is-striped">
-        <thead>
-          <tr>
-            <th>{t('address.timestamp')}</th>
-            <th>{t('address.transaction_id')}</th>
-            {isTablet && <th>{t('address.balance')}</th>}
-            {isTablet && <th>{t('address.changes')}</th>}
-          </tr>
-          {!isTablet && (
-            <tr>
-              <th>{t('address.balance')}</th>
-              <th>{t('address.changes')}</th>
-            </tr>
-          )}
-        </thead>
-        <tbody>
-          {transactions.map(tx => isTablet ? (
-            <tr key={tx.id}>
-              <td>{tx.timestamp ? formatTimestamp(tx.timestamp) : t('transaction.mempool')}</td>
-              <td><TransactionLink transaction={tx.id} /></td>
-              <td className="monospace">{formatRunebase(tx.balance, 8)} RUNES</td>
-              <td className="monospace">
-                {tx.amount > 0 ? '+' : tx.amount < 0 ? '-' : '\u00a0'}
-                {formatRunebase(Math.abs(tx.amount), 8)} RUNES
-              </td>
-            </tr>
-          ) : (
-            <React.Fragment key={tx.id}>
-              <tr>
-                <td>{tx.timestamp ? formatTimestamp(tx.timestamp) : t('transaction.mempool')}</td>
-                <td><TransactionLink transaction={tx.id} /></td>
-              </tr>
-              <tr>
-                <td className="monospace">{formatRunebase(tx.balance, 8)} RUNES</td>
-                <td className="monospace">
+      <TableContainer component={Paper} variant="outlined">
+        <Table size="small" sx={{ '& tbody tr:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>{t('address.timestamp')}</TableCell>
+              <TableCell>{t('address.transaction_id')}</TableCell>
+              {isTablet && <TableCell>{t('address.balance')}</TableCell>}
+              {isTablet && <TableCell>{t('address.changes')}</TableCell>}
+            </TableRow>
+            {!isTablet && (
+              <TableRow>
+                <TableCell>{t('address.balance')}</TableCell>
+                <TableCell>{t('address.changes')}</TableCell>
+              </TableRow>
+            )}
+          </TableHead>
+          <TableBody>
+            {transactions.map(tx => isTablet ? (
+              <TableRow key={tx.id}>
+                <TableCell>{tx.timestamp ? formatTimestamp(tx.timestamp) : t('transaction.mempool')}</TableCell>
+                <TableCell><TransactionLink transaction={tx.id} /></TableCell>
+                <TableCell sx={{ fontFamily: 'monospace' }}>{formatRunebase(tx.balance, 8)} RUNES</TableCell>
+                <TableCell sx={{ fontFamily: 'monospace' }}>
                   {tx.amount > 0 ? '+' : tx.amount < 0 ? '-' : '\u00a0'}
                   {formatRunebase(Math.abs(tx.amount), 8)} RUNES
-                </td>
-              </tr>
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                </TableCell>
+              </TableRow>
+            ) : (
+              <React.Fragment key={tx.id}>
+                <TableRow>
+                  <TableCell>{tx.timestamp ? formatTimestamp(tx.timestamp) : t('transaction.mempool')}</TableCell>
+                  <TableCell><TransactionLink transaction={tx.id} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace' }}>{formatRunebase(tx.balance, 8)} RUNES</TableCell>
+                  <TableCell sx={{ fontFamily: 'monospace' }}>
+                    {tx.amount > 0 ? '+' : tx.amount < 0 ? '-' : '\u00a0'}
+                    {formatRunebase(Math.abs(tx.amount), 8)} RUNES
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
     </div>
   )

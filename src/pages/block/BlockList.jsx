@@ -4,6 +4,17 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { formatRunebase, formatTimestamp } from '@/utils/format'
 import BlockModel from '@/models/block'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import Paper from '@mui/material/Paper'
 import BlockLink from '@/components/links/BlockLink'
 import AddressLink from '@/components/links/AddressLink'
 
@@ -13,6 +24,8 @@ function formatUTCTimestamp(date) {
   let dd = date.getUTCDate().toString().padStart(2, '0')
   return yyyy + '-' + mm + '-' + dd
 }
+
+const hiddenOnMobile = { display: { xs: 'none', lg: 'table-cell' } }
 
 export default function BlockList() {
   const { t } = useTranslation()
@@ -56,37 +69,43 @@ export default function BlockList() {
   }
 
   return (
-    <section className="container">
-      <form onSubmit={submit} style={{ display: 'flex' }}>
-        <div style={{ display: 'flex', margin: '0 auto' }}>
-          <input type="date" className="input" value={date} onChange={e => setDate(e.target.value)} style={{ width: '11em' }} />
-          <button type="submit" className="button is-runebase" style={{ marginLeft: '0.5em' }}>{t('action.go')}</button>
-        </div>
-      </form>
-      <table className="table is-fullwidth is-bordered is-striped" style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
-        <thead>
-          <tr>
-            <th>{t('block.list.height')}</th>
-            <th>{t('block.list.time')}</th>
-            <th className="is-hidden-touch">{t('block.list.reward')}</th>
-            <th className="is-hidden-touch">{t('block.list.mined_by')}</th>
-            <th className="is-hidden-touch">{t('block.list.size')}</th>
-            <th>{t('block.list.transactions')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.map(block => (
-            <tr key={block.height}>
-              <td><BlockLink block={block.height} clipboard={false} /></td>
-              <td>{formatTimestamp(block.timestamp)}</td>
-              <td className="is-hidden-touch monospace">{formatRunebase(block.reward, 8)} RUNES</td>
-              <td className="is-hidden-touch"><AddressLink address={block.miner} /></td>
-              <td className="is-hidden-touch monospace">{block.size.toLocaleString()}</td>
-              <td>{block.transactionCount}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
+    <Container maxWidth="lg">
+      <Box component="form" onSubmit={submit} sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+        <TextField
+          type="date"
+          size="small"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          sx={{ width: '11em' }}
+        />
+        <Button type="submit" variant="contained" color="primary" sx={{ ml: 1 }}>{t('action.go')}</Button>
+      </Box>
+      <TableContainer component={Paper} variant="outlined">
+        <Table size="small" sx={{ '& tbody tr:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>{t('block.list.height')}</TableCell>
+              <TableCell>{t('block.list.time')}</TableCell>
+              <TableCell sx={hiddenOnMobile}>{t('block.list.reward')}</TableCell>
+              <TableCell sx={hiddenOnMobile}>{t('block.list.mined_by')}</TableCell>
+              <TableCell sx={hiddenOnMobile}>{t('block.list.size')}</TableCell>
+              <TableCell>{t('block.list.transactions')}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {list.map(block => (
+              <TableRow key={block.height}>
+                <TableCell><BlockLink block={block.height} clipboard={false} /></TableCell>
+                <TableCell>{formatTimestamp(block.timestamp)}</TableCell>
+                <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{formatRunebase(block.reward, 8)} RUNES</TableCell>
+                <TableCell sx={hiddenOnMobile}><AddressLink address={block.miner} /></TableCell>
+                <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{block.size.toLocaleString()}</TableCell>
+                <TableCell>{block.transactionCount}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   )
 }

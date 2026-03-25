@@ -4,7 +4,14 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { formatRunebase, formatTimestamp } from '@/utils/format'
 import TransactionModel from '@/models/transaction'
-import Icon from '@/components/Icon'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
+import Divider from '@mui/material/Divider'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import SectionCard from '@/components/SectionCard'
+import InfoRow from '@/components/InfoRow'
 import FromNow from '@/components/FromNow'
 import Transaction from '@/components/Transaction'
 import TransactionLink from '@/components/links/TransactionLink'
@@ -24,7 +31,7 @@ export default function TxDetail() {
     }).catch(() => {})
   }, [txId])
 
-  if (!tx) return <div className="container">Loading...</div>
+  if (!tx) return <Container maxWidth="lg"><Typography>Loading...</Typography></Container>
 
   const confirmations = tx.blockHeight == null ? 0 : blockchainHeight - tx.blockHeight + 1
   const receipts = tx.outputs.map(o => o.receipt).filter(Boolean)
@@ -41,114 +48,91 @@ export default function TxDetail() {
   }
 
   return (
-    <section className="container">
-      <div className="card section-card">
-        <div className="card-header">
-          <div className="card-header-icon"><Icon icon="list-alt" fixedWidth /></div>
-          <h3 className="card-header-title">{t('transaction.summary')}</h3>
-        </div>
-        <div className="card-body info-table">
-          <div className="columns">
-            <div className="column info-title">{t('transaction.transaction_id')}</div>
-            <div className="column info-value monospace"><TransactionLink transaction={tx.id} plain /></div>
-          </div>
-          {tx.id !== tx.hash && (
-            <div className="columns">
-              <div className="column info-title">{t('transaction.transaction_hash')}</div>
-              <div className="column info-value monospace">
-                <TransactionLink transaction={tx.id} plain clipboard={tx.hash}>{tx.hash}</TransactionLink>
-              </div>
-            </div>
-          )}
-          {tx.blockHash && (
-            <div className="columns">
-              <div className="column info-title">{t('transaction.included_in_block')}</div>
-              <div className="column info-value">
-                <BlockLink block={tx.blockHeight} clipboard={tx.blockHash}>
-                  {tx.blockHeight} ({tx.blockHash})
-                </BlockLink>
-              </div>
-            </div>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('transaction.transaction_size')}</div>
-            <div className="column info-value">{tx.size.toLocaleString()} bytes</div>
-          </div>
-          {tx.timestamp && (
-            <div className="columns">
-              <div className="column info-title">{t('transaction.timestamp')}</div>
-              <div className="column info-value"><FromNow timestamp={tx.timestamp} /> ({formatTimestamp(tx.timestamp)})</div>
-            </div>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('transaction.confirmation')}</div>
-            <div className="column info-value">{confirmations}</div>
-          </div>
-          {tx.fees > 0 && (
-            <div className="columns">
-              <div className="column info-title">{t('transaction.transaction_fee')}</div>
-              <div className="column info-value monospace">{formatRunebase(tx.fees)} RUNES</div>
-            </div>
-          )}
+    <Container maxWidth="lg">
+      <SectionCard icon={<ListAltIcon sx={{ fontSize: 18 }} />} title={t('transaction.summary')}>
+        <InfoRow title={t('transaction.transaction_id')}>
+          <span style={{ fontFamily: 'monospace' }}><TransactionLink transaction={tx.id} plain /></span>
+        </InfoRow>
+        {tx.id !== tx.hash && (
+          <InfoRow title={t('transaction.transaction_hash')}>
+            <span style={{ fontFamily: 'monospace' }}>
+              <TransactionLink transaction={tx.id} plain clipboard={tx.hash}>{tx.hash}</TransactionLink>
+            </span>
+          </InfoRow>
+        )}
+        {tx.blockHash && (
+          <InfoRow title={t('transaction.included_in_block')}>
+            <BlockLink block={tx.blockHeight} clipboard={tx.blockHash}>
+              {tx.blockHeight} ({tx.blockHash})
+            </BlockLink>
+          </InfoRow>
+        )}
+        <InfoRow title={t('transaction.transaction_size')}>{tx.size.toLocaleString()} bytes</InfoRow>
+        {tx.timestamp && (
+          <InfoRow title={t('transaction.timestamp')}>
+            <FromNow timestamp={tx.timestamp} /> ({formatTimestamp(tx.timestamp)})
+          </InfoRow>
+        )}
+        <InfoRow title={t('transaction.confirmation')}>{confirmations}</InfoRow>
+        {tx.fees > 0 && (
+          <InfoRow title={t('transaction.transaction_fee')}>
+            <span style={{ fontFamily: 'monospace' }}>{formatRunebase(tx.fees)} RUNES</span>
+          </InfoRow>
+        )}
 
-          <Transaction transaction={tx} detailed onTransactionChange={refresh} />
+        <Transaction transaction={tx} detailed onTransactionChange={refresh} />
 
-          {receipts.map((receipt, i) => (
-            <div key={i} style={{ borderTop: '1px solid #ccc' }}>
-              <div className="columns">
-                <div className="column info-title">{t('transaction.receipt.sender')}</div>
-                <div className="column info-value"><AddressLink address={receipt.sender} /></div>
-              </div>
-              {receipt.contractAddressHex !== '0'.repeat(40) && (
-                <div className="columns">
-                  <div className="column info-title">{t('transaction.receipt.contract_address')}</div>
-                  <div className="column info-value"><AddressLink address={receipt.contractAddress} /></div>
-                </div>
-              )}
-              {receipt.gasUsed !== 0 && (
-                <div className="columns">
-                  <div className="column info-title">{t('transaction.receipt.gas_used')}</div>
-                  <div className="column info-value monospace">{receipt.gasUsed.toLocaleString()}</div>
-                </div>
-              )}
-              {receipt.excepted && receipt.excepted !== 'None' && (
-                <div className="columns">
-                  <div className="column info-title">{t('transaction.receipt.excepted')}</div>
-                  <div className="column info-value">{receipt.exceptedMessage || receipt.excepted}</div>
-                </div>
-              )}
-              {receipt.logs.length > 0 && (
-                <div className="columns">
-                  <div className="column info-title">{t('transaction.receipt.event_logs')}</div>
-                  <div className="column info-value">
-                    {receipt.logs.map((log, j) => (
-                      <ul key={j} style={{ display: 'inline-block', padding: '0.5em 1em', border: '1px solid #ccc', marginTop: j > 0 ? '0.5em' : 0 }}>
-                        <li><strong>{t('transaction.receipt.address')}</strong> <AddressLink address={log.address} /></li>
-                        <li><strong>{t('transaction.receipt.topics')}</strong>
-                          <ul className="monospace" style={{ listStyleType: 'disc', listStylePosition: 'inside' }}>
-                            {log.topics.map((topic, k) => <li key={k}>{topic}</li>)}
-                          </ul>
-                        </li>
-                        <li><strong>{t('transaction.receipt.data')}</strong> <span className="monospace">{log.data}</span></li>
-                        {log.abiList && log.abiList.length > 0 && (
-                          <li>
-                            <ul>
-                              {log.abiList.map(({ abi, params }, k) => (
-                                <pre key={k} style={{ padding: '0.5em', whiteSpace: 'pre-wrap' }}
-                                  dangerouslySetInnerHTML={{ __html: formatEvent(abi, params) }} />
-                              ))}
-                            </ul>
-                          </li>
-                        )}
-                      </ul>
+        {receipts.map((receipt, i) => (
+          <Box key={i} sx={{ borderTop: '1px solid', borderColor: 'divider', mt: 1, pt: 1 }}>
+            <InfoRow title={t('transaction.receipt.sender')}>
+              <AddressLink address={receipt.sender} />
+            </InfoRow>
+            {receipt.contractAddressHex !== '0'.repeat(40) && (
+              <InfoRow title={t('transaction.receipt.contract_address')}>
+                <AddressLink address={receipt.contractAddress} />
+              </InfoRow>
+            )}
+            {receipt.gasUsed !== 0 && (
+              <InfoRow title={t('transaction.receipt.gas_used')}>
+                <span style={{ fontFamily: 'monospace' }}>{receipt.gasUsed.toLocaleString()}</span>
+              </InfoRow>
+            )}
+            {receipt.excepted && receipt.excepted !== 'None' && (
+              <InfoRow title={t('transaction.receipt.excepted')}>
+                {receipt.exceptedMessage || receipt.excepted}
+              </InfoRow>
+            )}
+            {receipt.logs.length > 0 && (
+              <InfoRow title={t('transaction.receipt.event_logs')}>
+                {receipt.logs.map((log, j) => (
+                  <Paper key={j} variant="outlined" sx={{ p: 1, mt: j > 0 ? 1 : 0 }}>
+                    <Typography variant="body2">
+                      <strong>{t('transaction.receipt.address')}</strong>{' '}
+                      <AddressLink address={log.address} />
+                    </Typography>
+                    <Typography variant="body2"><strong>{t('transaction.receipt.topics')}</strong></Typography>
+                    <Box component="ul" sx={{ listStyleType: 'disc', pl: 3, fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                      {log.topics.map((topic, k) => <li key={k}>{topic}</li>)}
+                    </Box>
+                    <Typography variant="body2">
+                      <strong>{t('transaction.receipt.data')}</strong>{' '}
+                      <Box component="span" sx={{ fontFamily: 'monospace' }}>{log.data}</Box>
+                    </Typography>
+                    {log.abiList && log.abiList.length > 0 && log.abiList.map(({ abi, params }, k) => (
+                      <Box
+                        key={k}
+                        component="pre"
+                        sx={{ p: 0.5, whiteSpace: 'pre-wrap', fontSize: '0.85rem' }}
+                        dangerouslySetInnerHTML={{ __html: formatEvent(abi, params) }}
+                      />
                     ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+                  </Paper>
+                ))}
+              </InfoRow>
+            )}
+          </Box>
+        ))}
+      </SectionCard>
+    </Container>
   )
 }

@@ -3,7 +3,14 @@ import { Outlet, Link, useParams, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { formatRunebase, formatRrc20 } from '@/utils/format'
 import Contract from '@/models/contract'
-import Icon from '@/components/Icon'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import Typography from '@mui/material/Typography'
+import CodeIcon from '@mui/icons-material/Code'
+import SectionCard from '@/components/SectionCard'
+import InfoRow from '@/components/InfoRow'
 import AddressLink from '@/components/links/AddressLink'
 
 export default function ContractDetail() {
@@ -17,91 +24,59 @@ export default function ContractDetail() {
     Contract.get(id).then(setData).catch(() => {})
   }, [id])
 
-  if (!data) return <div className="container">Loading...</div>
+  if (!data) return <Container maxWidth="lg"><Typography>Loading...</Typography></Container>
 
   const existingTokenBalances = (data.qrc20Balances || []).filter(t => t.balance !== '0')
+  const isRichList = location.pathname.includes('/rich-list')
 
   return (
-    <section className="container">
-      <div className="card section-card">
-        <div className="card-header">
-          <div className="card-header-icon"><Icon icon="code" fixedWidth /></div>
-          <h3 className="card-header-title">{t('contract.summary')}</h3>
-        </div>
-        <div className="card-body info-table">
-          <div className="columns">
-            <div className="column info-title">{t('contract.address')}</div>
-            <div className="column info-value"><AddressLink address={data.address} plain /></div>
-          </div>
-          {data.qrc20 && (
-            <>
-              {data.qrc20.name && (
-                <div className="columns">
-                  <div className="column info-title">{t('contract.token.name')}</div>
-                  <div className="column info-value">{data.qrc20.name}</div>
-                </div>
-              )}
-              {data.qrc20.holders > 0 && (
-                <div className="columns">
-                  <div className="column info-title">{t('contract.token.total_supply')}</div>
-                  <div className="column info-value monospace">
-                    {formatRrc20(data.qrc20.totalSupply, data.qrc20.decimals, true)} {data.qrc20.symbol || t('contract.token.tokens')}
-                  </div>
-                </div>
-              )}
-              <div className="columns">
-                <div className="column info-title">{t('contract.token.token_holders')}</div>
-                <div className="column info-value">{data.qrc20.holders}</div>
-              </div>
-            </>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('contract.balance')}</div>
-            <div className="column info-value monospace">{formatRunebase(data.balance)} RUNES</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('contract.total_received')}</div>
-            <div className="column info-value monospace">{formatRunebase(data.totalReceived)} RUNES</div>
-          </div>
-          <div className="columns">
-            <div className="column info-title">{t('contract.total_sent')}</div>
-            <div className="column info-value monospace">{formatRunebase(data.totalSent)} RUNES</div>
-          </div>
-          {existingTokenBalances.length > 0 && (
-            <div className="columns">
-              <div className="column info-title">{t('address.token_balances')}</div>
-              <div className="column info-value">
-                {existingTokenBalances.map(token => (
-                  <div key={token.address} className="monospace">
-                    {formatRrc20(token.balance, token.decimals)}{' '}
-                    <AddressLink address={token.address}>{token.symbol || token.name || t('contract.token.tokens')}</AddressLink>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="columns">
-            <div className="column info-title">{t('contract.transaction_count')}</div>
-            <div className="column info-value">{data.transactionCount}</div>
-          </div>
-        </div>
-      </div>
+    <Container maxWidth="lg">
+      <SectionCard icon={<CodeIcon sx={{ fontSize: 18 }} />} title={t('contract.summary')}>
+        <InfoRow title={t('contract.address')}><AddressLink address={data.address} plain /></InfoRow>
+        {data.qrc20 && (
+          <>
+            {data.qrc20.name && <InfoRow title={t('contract.token.name')}>{data.qrc20.name}</InfoRow>}
+            {data.qrc20.holders > 0 && (
+              <InfoRow title={t('contract.token.total_supply')}>
+                <Box component="span" sx={{ fontFamily: 'monospace' }}>
+                  {formatRrc20(data.qrc20.totalSupply, data.qrc20.decimals, true)} {data.qrc20.symbol || t('contract.token.tokens')}
+                </Box>
+              </InfoRow>
+            )}
+            <InfoRow title={t('contract.token.token_holders')}>{data.qrc20.holders}</InfoRow>
+          </>
+        )}
+        <InfoRow title={t('contract.balance')}>
+          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.balance)} RUNES</Box>
+        </InfoRow>
+        <InfoRow title={t('contract.total_received')}>
+          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.totalReceived)} RUNES</Box>
+        </InfoRow>
+        <InfoRow title={t('contract.total_sent')}>
+          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.totalSent)} RUNES</Box>
+        </InfoRow>
+        {existingTokenBalances.length > 0 && (
+          <InfoRow title={t('address.token_balances')}>
+            {existingTokenBalances.map(token => (
+              <Box key={token.address} sx={{ fontFamily: 'monospace' }}>
+                {formatRrc20(token.balance, token.decimals)}{' '}
+                <AddressLink address={token.address}>{token.symbol || token.name || t('contract.token.tokens')}</AddressLink>
+              </Box>
+            ))}
+          </InfoRow>
+        )}
+        <InfoRow title={t('contract.transaction_count')}>{data.transactionCount}</InfoRow>
+      </SectionCard>
 
       {data.transactionCount > 0 && (
-        <div className="tabs is-centered">
-          <ul>
-            <li className={!location.pathname.includes('/rich-list') ? 'is-active' : ''}>
-              <Link to={`/contract/${id}`}>{t('contract.transaction_list')}</Link>
-            </li>
-            {data.type === 'qrc20' && (
-              <li className={location.pathname.includes('/rich-list') ? 'is-active' : ''}>
-                <Link to={`/contract/${id}/rich-list`}>{t('misc.rich_list_title')}</Link>
-              </li>
-            )}
-          </ul>
-        </div>
+        <Tabs value={isRichList ? 1 : 0} centered sx={{ mb: 2 }}>
+          <Tab label={t('contract.transaction_list')} component={Link} to={`/contract/${id}`} />
+          {data.type === 'qrc20' && (
+            <Tab label={t('misc.rich_list_title')} component={Link} to={`/contract/${id}/rich-list`} />
+          )}
+        </Tabs>
       )}
       <Outlet context={{ qrc20: data.qrc20 }} />
-    </section>
+    </Container>
   )
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
 
 export default function TransactionLink({ transaction, plain = false, clipboard = true, children }) {
@@ -7,13 +8,20 @@ export default function TransactionLink({ transaction, plain = false, clipboard 
   const clipboardStr = (clipboard === true ? transaction : clipboard).toString()
 
   return (
-    <span className="transaction-link">
+    <Box
+      component="span"
+      sx={{
+        position: 'relative',
+        display: 'inline',
+        '&:hover .clipboard': { opacity: 1 },
+      }}
+    >
       {plain ? (
-        <span className="break-word monospace">{display}</span>
+        <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
       ) : (
-        <Link to={`/tx/${transaction}`} className="break-word monospace">{display}</Link>
+        <Box component={Link} to={`/tx/${transaction}`} sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
       )}
       {clipboard && <Clipboard string={clipboardStr} />}
-    </span>
+    </Box>
   )
 }
