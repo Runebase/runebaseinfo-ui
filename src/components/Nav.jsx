@@ -14,6 +14,16 @@ import Tooltip from '@mui/material/Tooltip'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
+import ViewInArIcon from '@mui/icons-material/ViewInAr'
+import TokenIcon from '@mui/icons-material/Token'
+import BuildIcon from '@mui/icons-material/Build'
+import ShowChartIcon from '@mui/icons-material/ShowChart'
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered'
+import PersonIcon from '@mui/icons-material/Person'
+import CalculateIcon from '@mui/icons-material/Calculate'
+import SendIcon from '@mui/icons-material/Send'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
 import { useResponsive } from '@/hooks/useResponsive'
 import SearchDropdown from './SearchDropdown'
 
@@ -31,11 +41,11 @@ export default function Nav({ onSearchOpen }) {
   }
 
   const toolsItems = [
-    { path: '/misc/charts', label: t('misc.charts_title') },
-    { path: '/misc/rich-list', label: t('misc.rich_list_title') },
-    { path: '/misc/biggest-miners', label: t('misc.biggest_miners_title') },
-    { path: '/misc/stake-calculator', label: t('misc.stake_calculator.title') },
-    { path: '/misc/raw-tx', label: t('misc.send_raw_tx') },
+    { path: '/misc/charts', label: t('misc.charts_title'), icon: <ShowChartIcon /> },
+    { path: '/misc/rich-list', label: t('misc.rich_list_title'), icon: <FormatListNumberedIcon /> },
+    { path: '/misc/biggest-miners', label: t('misc.biggest_miners_title'), icon: <PersonIcon /> },
+    { path: '/misc/stake-calculator', label: t('misc.stake_calculator.title'), icon: <CalculateIcon /> },
+    { path: '/misc/raw-tx', label: t('misc.send_raw_tx'), icon: <SendIcon /> },
   ]
 
   const themeToggle = (
@@ -80,14 +90,15 @@ export default function Nav({ onSearchOpen }) {
         >
           <Box component="img" src="/images/RuneBase.png" alt="RuneBase Explorer" sx={{ height: 36 }} />
         </Box>
-        <Button component={Link} to="/block" color="inherit" sx={{ textTransform: 'uppercase', fontSize: '0.8rem' }}>
+        <Button component={Link} to="/block" color="inherit" startIcon={<ViewInArIcon />} sx={{ textTransform: 'uppercase', fontSize: '0.8rem' }}>
           {t('blockchain.block_plural')}
         </Button>
-        <Button component={Link} to="/contract/tokens" color="inherit" sx={{ textTransform: 'uppercase', fontSize: '0.8rem' }}>
+        <Button component={Link} to="/contract/tokens" color="inherit" startIcon={<TokenIcon />} sx={{ textTransform: 'uppercase', fontSize: '0.8rem' }}>
           {t('blockchain.token')}
         </Button>
         <Button
           color="inherit"
+          startIcon={<BuildIcon />}
           sx={{ textTransform: 'uppercase', fontSize: '0.8rem' }}
           endIcon={<ExpandMoreIcon />}
           onClick={e => setAnchorEl(e.currentTarget)}
@@ -97,7 +108,8 @@ export default function Nav({ onSearchOpen }) {
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
           {toolsItems.map(item => (
             <MenuItem key={item.path} onClick={() => navTo(item.path)}>
-              {item.label}
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText>{item.label}</ListItemText>
             </MenuItem>
           ))}
         </Menu>

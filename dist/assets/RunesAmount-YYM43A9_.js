@@ -1,0 +1,1 @@
+import{Z as e,p as t}from"./createSimplePaletteValueFilter-DbUAm8nL.js";var n=e(),r={width:`1.15em`,height:`1.15em`,mr:`0.25em`,flexShrink:0};function i({value:e,sx:i,...a}){return(0,n.jsxs)(t,{component:`span`,sx:{display:`inline-flex`,alignItems:`center`,...i},...a,children:[(0,n.jsx)(t,{component:`img`,src:`/images/RUNES.png`,alt:``,sx:r}),e,` RUNES`]})}export{i as t};
