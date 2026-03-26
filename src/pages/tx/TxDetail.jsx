@@ -81,7 +81,7 @@ export default function TxDetail() {
           </InfoRow>
         )}
 
-        <Transaction transaction={tx} detailed onTransactionChange={refresh} />
+        <Transaction transaction={tx} detailed embedded onTransactionChange={refresh} />
 
         {receipts.map((receipt, i) => (
           <Box key={i} sx={{ borderTop: '1px solid', borderColor: 'divider', mt: 1, pt: 1 }}>
@@ -112,10 +112,10 @@ export default function TxDetail() {
                       <AddressLink address={log.address} />
                     </Typography>
                     <Typography variant="body2"><strong>{t('transaction.receipt.topics')}</strong></Typography>
-                    <Box component="ul" sx={{ listStyleType: 'disc', pl: 3, fontFamily: monoFontFamily, fontSize: '0.85rem' }}>
+                    <Box component="ul" sx={{ listStyleType: 'disc', pl: 3, fontFamily: monoFontFamily, fontSize: '0.85rem', wordBreak: 'break-all' }}>
                       {log.topics.map((topic, k) => <li key={k}>{topic}</li>)}
                     </Box>
-                    <Typography variant="body2">
+                    <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
                       <strong>{t('transaction.receipt.data')}</strong>{' '}
                       <Box component="span" sx={{ fontFamily: monoFontFamily }}>{log.data}</Box>
                     </Typography>

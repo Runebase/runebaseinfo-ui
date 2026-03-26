@@ -36,7 +36,7 @@ function runebaseScript(asm) {
   return asm
 }
 
-export default function Transaction({ transaction, detailed = false, highlightAddress = [], onTransactionChange }) {
+export default function Transaction({ transaction, detailed = false, embedded = false, highlightAddress = [], onTransactionChange }) {
   const { t } = useTranslation()
   const blockchainHeight = useSelector(state => state.blockchain.height)
   const { subscribe, unsubscribe } = useWebSocket()
@@ -330,8 +330,9 @@ export default function Transaction({ transaction, detailed = false, highlightAd
   }
 
   return (
-    <Grid container sx={{ px: 1, borderTop: '1px solid', borderColor: 'divider', py: 0.5 }}>
-      {/* Header: tx link + confirmations */}
+    <Grid container sx={{ px: embedded ? 0 : 1, borderTop: embedded ? 'none' : '1px solid', borderColor: 'divider', py: 0.5 }}>
+      {/* Header: tx link + confirmations (hidden when embedded in TxDetail) */}
+      {!embedded && (
       <Grid size={12}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', pb: 0.25 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -364,16 +365,17 @@ export default function Transaction({ transaction, detailed = false, highlightAd
           </Box>
         </Box>
       </Grid>
+      )}
 
       {/* Inputs */}
-      <Grid size="grow" sx={{ minWidth: 0 }}>
+      <Grid size="grow" sx={{ minWidth: 0, overflow: 'hidden' }}>
         {inputs.map((input, i) => (
-          <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1 }}>
             {input.coinbase ? (
               <span>{t('transaction.coinbase_input')}</span>
             ) : (
               <>
-                <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+                <Box component="span" sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {input.address ? (
                     <AddressLink address={input.address}
                       plain={input.isInvalidContract} highlight={highlightAddress} clipboard={false} />
@@ -396,10 +398,10 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       {arrowColumn}
 
       {/* Outputs */}
-      <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
+      <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0, overflow: 'hidden' }}>
         {outputs.map((output, index) => (
-          <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+          <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1 }}>
+            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {output.address ? (
                 <AddressLink address={output.address}
                   plain={output.isInvalidContract} highlight={highlightAddress} clipboard={false} />
@@ -511,8 +513,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
         ) : t('contract.token.burn_tokens')
       ))}
 
-      {/* Fees */}
-      {fees !== '0' && (
+      {/* Fees (hidden when embedded in TxDetail) */}
+      {!embedded && fees !== '0' && (
         <Grid size={12} sx={{ textAlign: 'right', pb: 0.25 }}>
           {fees > 0 ? (
             <>{t('transaction.fee')} <Box component="span" sx={{ fontFamily: monoFontFamily, ml: 0.5 }}><RunesAmount value={formatRunebase(fees)} /></Box></>

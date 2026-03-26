@@ -7,7 +7,7 @@ export default function SectionCard({ icon, title, action, children, sx, ...prop
   const titleId = title ? `section-${title.replace(/\s+/g, '-').toLowerCase()}` : undefined
   return (
     <Card
-      sx={{ mx: { xs: 0, md: '0.75em' }, my: '0.5em', ...sx }}
+      sx={{ mx: { xs: 0, md: '0.75em' }, my: '0.5em', overflow: 'hidden', ...sx }}
       role="region"
       aria-labelledby={titleId}
       {...props}
