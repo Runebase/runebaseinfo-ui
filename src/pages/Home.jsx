@@ -398,36 +398,41 @@ export default function Home() {
                 </Fade>
               ))
             ) : (
-              // Desktop: horizontal layout
+              // Desktop: clean row layout
               recentBlocks.map((block, idx) => (
                 <Fade in key={block.hash} timeout={300 + idx * 50}>
-                  <Box sx={{ borderTop: '1px solid', borderColor: 'divider', p: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box
-                        component={Link}
-                        to={`/block/${block.height}`}
-                        sx={{
-                          display: 'flex', flexDirection: 'column', alignItems: 'center',
-                          minWidth: '11em', p: 1, bgcolor: 'action.hover', color: 'inherit',
-                          textDecoration: 'none', borderRadius: 1,
-                          transition: 'background-color 0.2s',
-                          '&:hover': { bgcolor: 'action.selected' },
-                        }}
-                      >
-                        <Typography variant="body2">{t('blockchain.block')} #{block.height}</Typography>
-                        <Typography variant="caption" color="text.secondary"><FromNow timestamp={block.timestamp} /></Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="body2">
-                          Mined by <AddressLink address={block.miner} />
-                        </Typography>
-                        <Typography variant="body2">
-                          {block.transactionCount} transactions in {block.interval} secs
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontFamily: monoFontFamily }}>
-                          {t('block.brief.reward')} <RunesAmount value={formatRunebase(block.reward)} />
+                  <Box sx={{
+                    borderTop: '1px solid', borderColor: 'divider',
+                    display: 'flex', alignItems: 'center', gap: 2,
+                    px: 1.5, py: 1,
+                    transition: 'background-color 0.15s',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}>
+                    <ViewInArIcon sx={{ fontSize: 28, color: 'primary.main', flexShrink: 0 }} />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
+                        <Box
+                          component={Link}
+                          to={`/block/${block.height}`}
+                          sx={{ fontWeight: 'bold', color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                        >
+                          #{block.height.toLocaleString()}
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                          <FromNow timestamp={block.timestamp} />
                         </Typography>
                       </Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        Mined by <AddressLink address={block.miner} />
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                      <Typography variant="body2" sx={{ fontFamily: monoFontFamily, fontWeight: 500 }}>
+                        <RunesAmount value={formatRunebase(block.reward)} />
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {block.transactionCount} txs
+                      </Typography>
                     </Box>
                   </Box>
                 </Fade>
@@ -442,16 +447,23 @@ export default function Home() {
             title={t('blockchain.transaction_plural')}
           >
             {loading ? <TxListSkeleton /> : isPhone ? (
-              // Mobile: transaction items with truncated hashes
               recentTransactions.map(tx => <MobileTxItem key={tx.id} tx={tx} />)
             ) : (
-              // Desktop: original layout
               recentTransactions.map(tx => (
-                <Box key={tx.id} sx={{ borderTop: '1px solid', borderColor: 'divider', px: 1, py: 0.5 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontFamily: monoFontFamily, fontSize: '0.85rem' }}>
-                    <TransactionLink transaction={tx.id} />
-                    <span><RunesAmount value={formatRunebase(tx.outputValue)} /></span>
+                <Box key={tx.id} sx={{
+                  borderTop: '1px solid', borderColor: 'divider',
+                  display: 'flex', alignItems: 'center', gap: 2,
+                  px: 1.5, py: 1,
+                  transition: 'background-color 0.15s',
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}>
+                  <ListAltIcon sx={{ fontSize: 28, color: 'primary.main', flexShrink: 0 }} />
+                  <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <TransactionLink transaction={tx.id}>{truncateHash(tx.id, 10, 6)}</TransactionLink>
                   </Box>
+                  <Typography variant="body2" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    <RunesAmount value={formatRunebase(tx.outputValue)} />
+                  </Typography>
                 </Box>
               ))
             )}
