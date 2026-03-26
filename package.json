@@ -1,8 +1,8 @@
 {
-  "name": "runebaseinfo-ui",
+  "name": "runebase-explorer-ui",
   "version": "1.0.0",
   "private": true,
-  "description": "An open-source frontend for the Runebaseinfo API",
+  "description": "An open-source frontend for the Runebase Explorer API",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,11 +15,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/runebase/runebaseinfo-ui.git"
+    "url": "git+https://github.com/runebase/runebase-explorer-ui.git"
   },
   "keywords": [
     "runebase",
-    "runebaseinfo",
+    "runebase-explorer",
     "runebase explorer"
   ],
   "license": "MIT",

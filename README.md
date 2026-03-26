@@ -1,4 +1,4 @@
-# runebaseinfo-ui
+# runebase-explorer-ui
 
 An open-source blockchain explorer frontend for the Runebase network.
 
@@ -17,7 +17,7 @@ An open-source blockchain explorer frontend for the Runebase network.
 ## Prerequisites
 
 - Node.js >= 18
-- [runebaseinfo-api](https://github.com/runebase/runebaseinfo-api) running on port 7001
+- [runebase-explorer-api](https://github.com/runebase/runebase-explorer-api) running on port 7001
 
 ## Getting Started
 
@@ -39,7 +39,7 @@ npm run preview
 
 | Variable | Default | Description |
 |---|---|---|
-| `RUNEBASEINFO_API_BASE_SERVER` | `http://localhost:7001` | Backend API URL (used by Vite proxy) |
+| `RUNEBASE_EXPLORER_API_BASE_SERVER` | `http://localhost:7001` | Backend API URL (used by Vite proxy) |
 | `RUNEBASE_NETWORK` | `mainnet` | Network: `mainnet` or `testnet` |
 
 In development, all `/api/*` requests are proxied to the backend. WebSocket connects directly to the backend.
