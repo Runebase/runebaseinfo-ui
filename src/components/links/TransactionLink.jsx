@@ -4,6 +4,7 @@ import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
 import { useResponsive } from '@/hooks/useResponsive'
 import { truncateHash } from '@/utils/format'
+import { monoFontFamily } from '../../theme'
 
 export default function TransactionLink({ transaction, plain = false, clipboard = true, children }) {
   const { isPhone } = useResponsive()
@@ -20,9 +21,9 @@ export default function TransactionLink({ transaction, plain = false, clipboard 
       }}
     >
       {plain ? (
-        <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
+        <Box component="span" sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{display}</Box>
       ) : (
-        <Box component={Link} to={`/tx/${transaction}`} sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
+        <Box component={Link} to={`/tx/${transaction}`} sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{display}</Box>
       )}
       {clipboard && <Clipboard string={clipboardStr} />}
     </Box>

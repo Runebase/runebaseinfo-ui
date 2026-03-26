@@ -18,6 +18,7 @@ import Paper from '@mui/material/Paper'
 import Pagination from '@/components/Pagination'
 import TransactionLink from '@/components/links/TransactionLink'
 import AddressLink from '@/components/links/AddressLink'
+import { monoFontFamily } from '../../theme'
 
 export default function AddressTokenBalance() {
   const { t } = useTranslation()
@@ -77,7 +78,7 @@ export default function AddressTokenBalance() {
                 <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
                 <TableCell><TransactionLink transaction={tx.id} /></TableCell>
                 {isTablet && (
-                  <TableCell sx={{ fontFamily: 'monospace' }}>
+                  <TableCell sx={{ fontFamily: monoFontFamily }}>
                     {(tx.tokens || []).map((tok, i) => (
                       <div key={i}>
                         {formatRrc20((tok.balance || '').replace('-', ''), tok.decimals)}{' '}
@@ -87,7 +88,7 @@ export default function AddressTokenBalance() {
                   </TableCell>
                 )}
                 {isTablet && (
-                  <TableCell sx={{ fontFamily: 'monospace' }}>
+                  <TableCell sx={{ fontFamily: monoFontFamily }}>
                     {(tx.tokens || []).map((tok, i) => (
                       <div key={i}>
                         {tok.amount > 0 ? '+' : tok.amount < 0 ? '-' : '\u00a0'}

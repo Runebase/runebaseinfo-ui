@@ -10,6 +10,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { monoFontFamily } from '../../theme'
 
 export default function StakeCalculator() {
   const { t } = useTranslation()
@@ -23,7 +24,7 @@ export default function StakeCalculator() {
   const [triggerGetAddress] = useLazyGetAddressQuery()
 
   useEffect(() => {
-    document.title = t('misc.stake_calculator.title') + ' - explorer.runebase.io'
+    document.title = t('misc.stake_calculator.title') + ' - RuneBase Explorer'
     triggerGetInfo().unwrap().then(({ netStakeWeight: w }) => setNetStakeWeight(w)).catch(() => {})
 
     const onWeight = (w) => setNetStakeWeight(w)
@@ -63,7 +64,7 @@ export default function StakeCalculator() {
       <Stack spacing={2}>
         <Box>
           <Typography variant="body2" fontWeight="bold" gutterBottom>{t('blockchain.network_weight')}</Typography>
-          <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>{formatRunebase(netStakeWeight, 8)}</Typography>
+          <Typography variant="body1" sx={{ fontFamily: monoFontFamily }}>{formatRunebase(netStakeWeight, 8)}</Typography>
         </Box>
         <TextField
           label={t('misc.stake_calculator.enter_address')}
@@ -71,7 +72,7 @@ export default function StakeCalculator() {
           onChange={e => setAddress(e.target.value)}
           fullWidth
           size="small"
-          slotProps={{ input: { sx: { fontFamily: 'monospace' } } }}
+          slotProps={{ input: { sx: { fontFamily: monoFontFamily } } }}
         />
         <TextField
           label={t('misc.stake_calculator.weight')}
@@ -81,7 +82,7 @@ export default function StakeCalculator() {
           placeholder="0"
           fullWidth
           size="small"
-          slotProps={{ input: { sx: { fontFamily: 'monospace' } } }}
+          slotProps={{ input: { sx: { fontFamily: monoFontFamily } } }}
         />
         {weight > 0 && (
           <>
@@ -103,7 +104,7 @@ export default function StakeCalculator() {
         )}
         <Box>
           <Typography variant="body2" fontWeight="bold" gutterBottom>{t('misc.stake_calculator.yearly_roi')}</Typography>
-          <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+          <Typography variant="body1" sx={{ fontFamily: monoFontFamily }}>
             {netStakeWeight ? new BigNumber(reward).times(365).times(675).dividedBy(netStakeWeight).times(100).toFixed(2) : 0}%
           </Typography>
         </Box>

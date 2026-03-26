@@ -17,6 +17,8 @@ import TransactionLink from '@/components/links/TransactionLink'
 import BlockLink from '@/components/links/BlockLink'
 import AddressLink from '@/components/links/AddressLink'
 import DetailSkeleton from '@/components/DetailSkeleton'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 export default function TxDetail() {
   const { t } = useTranslation()
@@ -26,7 +28,7 @@ export default function TxDetail() {
 
   useEffect(() => {
     if (tx) {
-      document.title = t('blockchain.transaction') + ' ' + tx.id + ' - explorer.runebase.io'
+      document.title = t('blockchain.transaction') + ' ' + tx.id + ' - RuneBase Explorer'
     }
   }, [tx])
 
@@ -50,11 +52,11 @@ export default function TxDetail() {
     <Container maxWidth="lg">
       <SectionCard icon={<ListAltIcon sx={{ fontSize: 18 }} />} title={t('transaction.summary')}>
         <InfoRow title={t('transaction.transaction_id')}>
-          <span style={{ fontFamily: 'monospace' }}><TransactionLink transaction={tx.id} plain /></span>
+          <span style={{ fontFamily: monoFontFamily }}><TransactionLink transaction={tx.id} plain /></span>
         </InfoRow>
         {tx.id !== tx.hash && (
           <InfoRow title={t('transaction.transaction_hash')}>
-            <span style={{ fontFamily: 'monospace' }}>
+            <span style={{ fontFamily: monoFontFamily }}>
               <TransactionLink transaction={tx.id} plain clipboard={tx.hash}>{tx.hash}</TransactionLink>
             </span>
           </InfoRow>
@@ -75,7 +77,7 @@ export default function TxDetail() {
         <InfoRow title={t('transaction.confirmation')}>{confirmations}</InfoRow>
         {tx.fees > 0 && (
           <InfoRow title={t('transaction.transaction_fee')}>
-            <span style={{ fontFamily: 'monospace' }}>{formatRunebase(tx.fees)} RUNES</span>
+            <span style={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(tx.fees)} /></span>
           </InfoRow>
         )}
 
@@ -93,7 +95,7 @@ export default function TxDetail() {
             )}
             {receipt.gasUsed !== 0 && (
               <InfoRow title={t('transaction.receipt.gas_used')}>
-                <span style={{ fontFamily: 'monospace' }}>{receipt.gasUsed.toLocaleString()}</span>
+                <span style={{ fontFamily: monoFontFamily }}>{receipt.gasUsed.toLocaleString()}</span>
               </InfoRow>
             )}
             {receipt.excepted && receipt.excepted !== 'None' && (
@@ -110,12 +112,12 @@ export default function TxDetail() {
                       <AddressLink address={log.address} />
                     </Typography>
                     <Typography variant="body2"><strong>{t('transaction.receipt.topics')}</strong></Typography>
-                    <Box component="ul" sx={{ listStyleType: 'disc', pl: 3, fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                    <Box component="ul" sx={{ listStyleType: 'disc', pl: 3, fontFamily: monoFontFamily, fontSize: '0.85rem' }}>
                       {log.topics.map((topic, k) => <li key={k}>{topic}</li>)}
                     </Box>
                     <Typography variant="body2">
                       <strong>{t('transaction.receipt.data')}</strong>{' '}
-                      <Box component="span" sx={{ fontFamily: 'monospace' }}>{log.data}</Box>
+                      <Box component="span" sx={{ fontFamily: monoFontFamily }}>{log.data}</Box>
                     </Typography>
                     {log.abiList && log.abiList.length > 0 && log.abiList.map(({ abi, params }, k) => (
                       <Box

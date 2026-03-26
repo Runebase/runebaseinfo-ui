@@ -30,6 +30,8 @@ import FromNow from '@/components/FromNow'
 import AddressLink from '@/components/links/AddressLink'
 import TransactionLink from '@/components/links/TransactionLink'
 import Sparkline from '@/components/Sparkline'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../theme'
 
 function StatSkeleton() {
   return (
@@ -83,7 +85,7 @@ function MobileStatGrid({ statRows }) {
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2 }}>
             {row.label}
           </Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold', fontSize: '0.8rem' }}>
+          <Typography variant="body2" sx={{ fontFamily: monoFontFamily, fontWeight: 'bold', fontSize: '0.8rem' }}>
             {row.value}
           </Typography>
         </Paper>
@@ -112,11 +114,11 @@ function MobileBlockItem({ block, t }) {
         Miner: <AddressLink address={block.miner} />
       </Typography>
       <Box sx={{ display: 'flex', gap: 1.5 }}>
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
           {block.transactionCount} txs
         </Typography>
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-          {formatRunebase(block.reward)} RUNES
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
+          <RunesAmount value={formatRunebase(block.reward)} />
         </Typography>
       </Box>
     </Paper>
@@ -129,8 +131,8 @@ function MobileTxItem({ tx }) {
     <Box sx={{ borderTop: '1px solid', borderColor: 'divider', px: 1, py: 0.75 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <TransactionLink transaction={tx.id} />
-        <Typography variant="caption" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', ml: 1 }}>
-          {formatRunebase(tx.outputValue)} RUNES
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', ml: 1 }}>
+          <RunesAmount value={formatRunebase(tx.outputValue)} />
         </Typography>
       </Box>
     </Box>
@@ -185,7 +187,7 @@ export default function Home() {
   }, [triggerRecentBlocks, triggerRecentTxs, triggerInfo, triggerGetBlock])
 
   useEffect(() => {
-    document.title = 'runebase'
+    document.title = 'RuneBase Explorer'
     loadData()
   }, [])
 
@@ -343,7 +345,7 @@ export default function Home() {
                     <Box key={i} sx={{ px: 1, py: 0.1 }}>
                       <Typography variant="body2" component="span" fontWeight="bold">{row.label}</Typography>
                       {': '}
-                      <Typography variant="body2" component="span" sx={{ fontFamily: 'monospace' }}>{row.value}</Typography>
+                      <Typography variant="body2" component="span" sx={{ fontFamily: monoFontFamily }}>{row.value}</Typography>
                     </Box>
                   ))}
                 </Box>
@@ -422,8 +424,8 @@ export default function Home() {
                         <Typography variant="body2">
                           {block.transactionCount} transactions in {block.interval} secs
                         </Typography>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {t('block.brief.reward')} {formatRunebase(block.reward)} RUNES
+                        <Typography variant="body2" sx={{ fontFamily: monoFontFamily }}>
+                          {t('block.brief.reward')} <RunesAmount value={formatRunebase(block.reward)} />
                         </Typography>
                       </Box>
                     </Box>
@@ -446,9 +448,9 @@ export default function Home() {
               // Desktop: original layout
               recentTransactions.map(tx => (
                 <Box key={tx.id} sx={{ borderTop: '1px solid', borderColor: 'divider', px: 1, py: 0.5 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontFamily: monoFontFamily, fontSize: '0.85rem' }}>
                     <TransactionLink transaction={tx.id} />
-                    <span>{formatRunebase(tx.outputValue)} RUNES</span>
+                    <span><RunesAmount value={formatRunebase(tx.outputValue)} /></span>
                   </Box>
                 </Box>
               ))

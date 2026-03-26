@@ -24,6 +24,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import CodeIcon from '@mui/icons-material/Code'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { useResponsive } from '@/hooks/useResponsive'
+import { monoFontFamily } from '../theme'
 
 const MAX_RECENT = 5
 
@@ -221,7 +222,7 @@ export default function SearchDropdown({ onNavigate }) {
                     </ListItemIcon>
                     <ListItemText
                       primary={s}
-                      primaryTypographyProps={{ fontSize: '0.8rem', noWrap: true, fontFamily: 'monospace' }}
+                      primaryTypographyProps={{ fontSize: '0.8rem', noWrap: true, fontFamily: monoFontFamily }}
                     />
                   </ListItemButton>
                 ))}
@@ -256,7 +257,7 @@ export default function SearchDropdown({ onNavigate }) {
                         size="small"
                         sx={{ height: 20, fontSize: '0.7rem' }}
                       />
-                      <Typography variant="body2" noWrap sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      <Typography variant="body2" noWrap sx={{ fontFamily: monoFontFamily, fontSize: '0.8rem' }}>
                         {query.trim()}
                       </Typography>
                     </Box>

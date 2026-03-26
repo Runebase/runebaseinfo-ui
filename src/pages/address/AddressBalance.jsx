@@ -20,6 +20,8 @@ import TransactionLink from '@/components/links/TransactionLink'
 import SortableTableHead from '@/components/SortableTableHead'
 import TableDensityToggle from '@/components/TableDensityToggle'
 import ExportCSVButton from '@/components/ExportCSVButton'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 export default function AddressBalance() {
   const { t } = useTranslation()
@@ -93,10 +95,10 @@ export default function AddressBalance() {
               <TableRow key={tx.id}>
                 <TableCell>{tx.timestamp ? formatTimestamp(tx.timestamp) : t('transaction.mempool')}</TableCell>
                 <TableCell><TransactionLink transaction={tx.id} /></TableCell>
-                <TableCell sx={{ fontFamily: 'monospace' }}>{formatRunebase(tx.balance, 8)} RUNES</TableCell>
-                <TableCell sx={{ fontFamily: 'monospace', color: tx.amount > 0 ? 'success.main' : tx.amount < 0 ? 'error.main' : 'text.primary' }}>
+                <TableCell sx={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(tx.balance, 8)} /></TableCell>
+                <TableCell sx={{ fontFamily: monoFontFamily, color: tx.amount > 0 ? 'success.main' : tx.amount < 0 ? 'error.main' : 'text.primary' }}>
                   {tx.amount > 0 ? '+' : tx.amount < 0 ? '-' : '\u00a0'}
-                  {formatRunebase(Math.abs(tx.amount), 8)} RUNES
+                  <RunesAmount value={formatRunebase(Math.abs(tx.amount), 8)} />
                 </TableCell>
               </TableRow>
             ) : (
@@ -106,10 +108,10 @@ export default function AddressBalance() {
                   <TableCell><TransactionLink transaction={tx.id} /></TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell sx={{ fontFamily: 'monospace' }}>{formatRunebase(tx.balance, 8)} RUNES</TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace', color: tx.amount > 0 ? 'success.main' : tx.amount < 0 ? 'error.main' : 'text.primary' }}>
+                  <TableCell sx={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(tx.balance, 8)} /></TableCell>
+                  <TableCell sx={{ fontFamily: monoFontFamily, color: tx.amount > 0 ? 'success.main' : tx.amount < 0 ? 'error.main' : 'text.primary' }}>
                     {tx.amount > 0 ? '+' : tx.amount < 0 ? '-' : '\u00a0'}
-                    {formatRunebase(Math.abs(tx.amount), 8)} RUNES
+                    <RunesAmount value={formatRunebase(Math.abs(tx.amount), 8)} />
                   </TableCell>
                 </TableRow>
               </React.Fragment>

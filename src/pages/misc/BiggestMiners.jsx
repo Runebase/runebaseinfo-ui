@@ -20,6 +20,8 @@ import Pagination from '@/components/Pagination'
 import AddressLink from '@/components/links/AddressLink'
 import TableSkeleton from '@/components/TableSkeleton'
 import EmptyState from '@/components/EmptyState'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 const hiddenOnMobile = { display: { xs: 'none', lg: 'table-cell' } }
 const stickyHead = { position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }
@@ -29,7 +31,7 @@ function MobileMinerCard({ address, blocks, balance, rank, percentage }) {
     <Paper variant="outlined" sx={{ p: 1.5, mb: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
         <Chip label={`#${rank}`} size="small" variant="outlined" />
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
           {percentage}%
         </Typography>
       </Box>
@@ -40,8 +42,8 @@ function MobileMinerCard({ address, blocks, balance, rank, percentage }) {
         <Typography variant="caption" color="text.secondary">
           {blocks} blocks
         </Typography>
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-          {formatRunebase(balance, 8)} RUNES
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
+          <RunesAmount value={formatRunebase(balance, 8)} />
         </Typography>
       </Box>
     </Paper>
@@ -61,7 +63,7 @@ export default function BiggestMiners() {
   const list = data?.list
   const pages = Math.ceil(totalCount / 100)
 
-  document.title = t('misc.biggest_miners_title') + ' - explorer.runebase.io'
+  document.title = t('misc.biggest_miners_title') + ' - RuneBase Explorer'
 
   function getLink(page) { return `/misc/biggest-miners?page=${page}` }
 
@@ -103,8 +105,8 @@ export default function BiggestMiners() {
                   <TableCell>{100 * (currentPage - 1) + index + 1}</TableCell>
                   <TableCell><AddressLink address={address} /></TableCell>
                   <TableCell>{blocks}</TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace' }}>{new BigNumber(blocks).dividedBy(posBlocks).times(100).toFixed(4)}%</TableCell>
-                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{formatRunebase(balance, 8)}</TableCell>
+                  <TableCell sx={{ fontFamily: monoFontFamily }}>{new BigNumber(blocks).dividedBy(posBlocks).times(100).toFixed(4)}%</TableCell>
+                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: monoFontFamily }}>{formatRunebase(balance, 8)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

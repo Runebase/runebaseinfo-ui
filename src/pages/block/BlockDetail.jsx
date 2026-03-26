@@ -14,6 +14,8 @@ import Transaction from '@/components/Transaction'
 import BlockLink from '@/components/links/BlockLink'
 import AddressLink from '@/components/links/AddressLink'
 import DetailSkeleton from '@/components/DetailSkeleton'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 export default function BlockDetail() {
   const { t } = useTranslation()
@@ -27,7 +29,7 @@ export default function BlockDetail() {
 
   useEffect(() => {
     if (block) {
-      document.title = t('blockchain.block') + ' #' + block.height + ' - explorer.runebase.io'
+      document.title = t('blockchain.block') + ' #' + block.height + ' - RuneBase Explorer'
     }
   }, [block])
 
@@ -48,11 +50,11 @@ export default function BlockDetail() {
         <InfoRow title={t('block.block_weight')}>{(block.weight || 0).toLocaleString()} {t('block.bytes')}</InfoRow>
         <InfoRow title={t('block.timestamp')}><FromNow timestamp={block.timestamp} /> ({formatTimestamp(block.timestamp)})</InfoRow>
         <InfoRow title={t('block.block_reward')}>
-          <span style={{ fontFamily: 'monospace' }}>{formatRunebase(block.reward)} RUNES</span>
+          <span style={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(block.reward)} /></span>
         </InfoRow>
         <InfoRow title={t('block.difficulty')}>{block.difficulty}</InfoRow>
         <InfoRow title={t('block.merkle_root')}>
-          <span style={{ fontFamily: 'monospace' }}>{block.merkleRoot}</span>
+          <span style={{ fontFamily: monoFontFamily }}>{block.merkleRoot}</span>
         </InfoRow>
         {block.miner && (
           <InfoRow title={t('block.mined_by')}><AddressLink address={block.miner} /></InfoRow>

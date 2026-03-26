@@ -12,6 +12,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import { createAppTheme } from './theme'
 import './i18n'
 
+import './fonts.css'
 import './icons/style.css'
 
 function ThemedApp() {

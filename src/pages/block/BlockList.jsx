@@ -24,6 +24,8 @@ import TableSkeleton from '@/components/TableSkeleton'
 import EmptyState from '@/components/EmptyState'
 import SortableTableHead from '@/components/SortableTableHead'
 import TableDensityToggle from '@/components/TableDensityToggle'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 function formatUTCTimestamp(date) {
   let yyyy = date.getUTCFullYear().toString()
@@ -49,13 +51,13 @@ function MobileBlockCard({ block }) {
         <AddressLink address={block.miner} />
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 0.5 }}>
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
           {block.transactionCount} txs
         </Typography>
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-          {formatRunebase(block.reward, 8)} RUNES
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
+          <RunesAmount value={formatRunebase(block.reward, 8)} />
         </Typography>
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
           {block.size.toLocaleString()} bytes
         </Typography>
       </Box>
@@ -79,7 +81,7 @@ export default function BlockList() {
   })
 
   useEffect(() => {
-    document.title = t('block.list.block_list') + ' - explorer.runebase.io'
+    document.title = t('block.list.block_list') + ' - RuneBase Explorer'
     const d = queryDate ? new Date(queryDate) : new Date()
     setDate(formatUTCTimestamp(d))
   }, [queryDate])
@@ -146,9 +148,9 @@ export default function BlockList() {
                 <TableRow key={block.height} sx={hoverRow}>
                   <TableCell><BlockLink block={block.height} clipboard={false} /></TableCell>
                   <TableCell>{formatTimestamp(block.timestamp)}</TableCell>
-                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{formatRunebase(block.reward, 8)} RUNES</TableCell>
+                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(block.reward, 8)} /></TableCell>
                   <TableCell sx={hiddenOnMobile}><AddressLink address={block.miner} /></TableCell>
-                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{block.size.toLocaleString()}</TableCell>
+                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: monoFontFamily }}>{block.size.toLocaleString()}</TableCell>
                   <TableCell>{block.transactionCount}</TableCell>
                 </TableRow>
               ))}

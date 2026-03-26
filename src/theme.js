@@ -2,6 +2,7 @@ import { createTheme } from '@mui/material/styles'
 
 const sharedTypography = {
   fontFamily: [
+    'Inter',
     '-apple-system',
     'BlinkMacSystemFont',
     '"Segoe UI"',
@@ -12,6 +13,15 @@ const sharedTypography = {
     '"Segoe UI Emoji"',
   ].join(','),
 }
+
+export const monoFontFamily = [
+  '"JetBrains Mono"',
+  '"Fira Code"',
+  '"Cascadia Code"',
+  'Menlo',
+  'Consolas',
+  'monospace',
+].join(',')
 
 const sharedComponents = {
   MuiCard: {

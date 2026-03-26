@@ -18,6 +18,7 @@ import ContactsIcon from '@mui/icons-material/Contacts'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddressLink from './links/AddressLink'
 import { useResponsive } from '@/hooks/useResponsive'
+import { monoFontFamily } from '../theme'
 
 export default function MyAddresses() {
   const { t } = useTranslation()
@@ -113,7 +114,7 @@ export default function MyAddresses() {
                   <TableCell sx={{ p: 0.5 }}>
                     <AddressLink address={address} onClick={() => setShow(false)} />
                   </TableCell>
-                  <TableCell align="right" sx={{ p: 0.5, fontFamily: 'monospace' }}>
+                  <TableCell align="right" sx={{ p: 0.5, fontFamily: monoFontFamily }}>
                     {formatRunebase(balance, 8)}
                   </TableCell>
                   <TableCell sx={{ p: 0.5 }}>
@@ -132,7 +133,7 @@ export default function MyAddresses() {
                       {t('my_addresses.summary')}
                     </AddressLink>
                   </TableCell>
-                  <TableCell align="right" sx={{ p: 0.5, fontFamily: 'monospace' }}>
+                  <TableCell align="right" sx={{ p: 0.5, fontFamily: monoFontFamily }}>
                     {formatRunebase(totalBalance, 8)}
                   </TableCell>
                   <TableCell />

@@ -4,6 +4,7 @@ import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
 import { useResponsive } from '@/hooks/useResponsive'
 import { truncateHash } from '@/utils/format'
+import { monoFontFamily } from '../../theme'
 
 export default function AddressLink({ address, plain = false, highlight = [], clipboard = true, children, onClick, className = '' }) {
   const highlights = Array.isArray(highlight) ? highlight : [highlight]
@@ -23,9 +24,9 @@ export default function AddressLink({ address, plain = false, highlight = [], cl
       }}
     >
       {plain || isHighlighted ? (
-        <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
+        <Box component="span" sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{display}</Box>
       ) : (
-        <Box component={Link} to={linkTo} onClick={onClick} sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
+        <Box component={Link} to={linkTo} onClick={onClick} sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{display}</Box>
       )}
       {clipboard && <Clipboard string={address} />}
     </Box>

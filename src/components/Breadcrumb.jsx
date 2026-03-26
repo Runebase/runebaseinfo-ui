@@ -10,6 +10,7 @@ import ContactMailIcon from '@mui/icons-material/ContactMail'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 import CodeIcon from '@mui/icons-material/Code'
 import ShowChartIcon from '@mui/icons-material/ShowChart'
+import { monoFontFamily } from '../theme'
 
 const iconMap = {
   cubes: ViewInArIcon,
@@ -74,7 +75,7 @@ export default function Breadcrumb() {
               alignItems: 'center',
               gap: 0.5,
               maxWidth: '15em',
-              fontFamily: 'monospace',
+              fontFamily: monoFontFamily,
             }}
           >
             {IconComp && <IconComp fontSize="small" />}
@@ -82,7 +83,7 @@ export default function Breadcrumb() {
               variant="body2"
               noWrap
               component="span"
-              sx={{ fontFamily: 'monospace' }}
+              sx={{ fontFamily: monoFontFamily }}
             >
               {crumb.label}
             </Typography>

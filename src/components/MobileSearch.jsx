@@ -25,6 +25,7 @@ import ViewInArIcon from '@mui/icons-material/ViewInAr'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import CodeIcon from '@mui/icons-material/Code'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import { monoFontFamily } from '../theme'
 
 const MAX_RECENT = 8
 
@@ -148,7 +149,7 @@ export default function MobileSearch({ open, onClose }) {
                   </ListItemIcon>
                   <ListItemText
                     primary={s.length > 24 ? s.slice(0, 10) + '...' + s.slice(-8) : s}
-                    primaryTypographyProps={{ fontFamily: 'monospace', fontSize: '0.9rem' }}
+                    primaryTypographyProps={{ fontFamily: monoFontFamily, fontSize: '0.9rem' }}
                   />
                 </ListItemButton>
               ))}
@@ -182,7 +183,7 @@ export default function MobileSearch({ open, onClose }) {
                       color={typeConfig[result.type]?.color || 'default'}
                       size="small"
                     />
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    <Typography variant="body2" sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>
                       {query.trim().length > 20 ? query.trim().slice(0, 12) + '...' + query.trim().slice(-8) : query.trim()}
                     </Typography>
                   </Box>

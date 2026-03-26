@@ -27,6 +27,8 @@ import QRCodeDialog from '@/components/QRCodeDialog'
 import { useSnackbar } from '@/hooks/useSnackbar'
 import { useResponsive } from '@/hooks/useResponsive'
 import { useSwipeable } from '@/hooks/useSwipeable'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 export default function AddressDetail() {
   const { t } = useTranslation()
@@ -66,7 +68,7 @@ export default function AddressDetail() {
 
   if (!data) return <Container maxWidth="lg"><DetailSkeleton rows={8} /></Container>
 
-  document.title = t('blockchain.address') + ' ' + id + ' - explorer.runebase.io'
+  document.title = t('blockchain.address') + ' ' + id + ' - RuneBase Explorer'
 
   const existingTokenBalances = (data.qrc20Balances || []).filter(t => t.balance !== '0')
 
@@ -122,8 +124,8 @@ export default function AddressDetail() {
           textAlign: 'center', py: 2, mb: 1,
           borderBottom: '1px solid', borderColor: 'divider',
         }}>
-          <Typography variant="h4" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: 'primary.main', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
-            {formatRunebase(data.balance)} RUNES
+          <Typography variant="h4" sx={{ fontFamily: monoFontFamily, fontWeight: 'bold', color: 'primary.main', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
+            <RunesAmount value={formatRunebase(data.balance)} />
           </Typography>
           {data.unconfirmed !== '0' && (
             <Chip
@@ -150,10 +152,10 @@ export default function AddressDetail() {
         </InfoRow>
         {data.ranking > 0 && <InfoRow title={t('misc.ranking')}>{data.ranking}</InfoRow>}
         <InfoRow title={t('address.total_received')}>
-          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.totalReceived)} RUNES</Box>
+          <Box component="span" sx={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(data.totalReceived)} /></Box>
         </InfoRow>
         <InfoRow title={t('address.total_sent')}>
-          <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(data.totalSent)} RUNES</Box>
+          <Box component="span" sx={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(data.totalSent)} /></Box>
         </InfoRow>
         {existingTokenBalances.length > 0 && (
           <InfoRow title={t('address.token_balances')}>
@@ -167,7 +169,7 @@ export default function AddressDetail() {
                   clickable
                   size="small"
                   variant="outlined"
-                  sx={{ fontFamily: 'monospace' }}
+                  sx={{ fontFamily: monoFontFamily }}
                 />
               ))}
             </Box>

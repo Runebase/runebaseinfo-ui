@@ -8,6 +8,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import CloseIcon from '@mui/icons-material/Close'
 import Clipboard from './Clipboard'
+import { monoFontFamily } from '../theme'
 
 export default function QRCodeDialog({ open, onClose, value, title = 'QR Code' }) {
   return (
@@ -25,7 +26,7 @@ export default function QRCodeDialog({ open, onClose, value, title = 'QR Code' }
         <Box sx={{ display: 'flex', alignItems: 'center', maxWidth: '100%' }}>
           <Typography
             variant="caption"
-            sx={{ fontFamily: 'monospace', wordBreak: 'break-all', textAlign: 'center' }}
+            sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all', textAlign: 'center' }}
           >
             {value}
           </Typography>

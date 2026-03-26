@@ -91,7 +91,7 @@ export default function Charts() {
   })
 
   useEffect(() => {
-    document.title = t('misc.charts_title') + ' - explorer.runebase.io'
+    document.title = t('misc.charts_title') + ' - RuneBase Explorer'
   }, [])
 
   const loading = l1 || l2 || l3

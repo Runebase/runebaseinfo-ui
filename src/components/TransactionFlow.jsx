@@ -16,6 +16,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import AddressLink from './links/AddressLink'
 import TransactionLink from './links/TransactionLink'
 import Transaction from './Transaction'
+import RunesAmount from './RunesAmount'
+import { monoFontFamily } from '../theme'
 
 function getTxType(tx) {
   const { inputs, outputs } = tx
@@ -132,8 +134,8 @@ export default function TransactionFlow({ transaction, highlightAddress = [] }) 
           {receivers.slice(0, 3).map(([addr, value], i) => (
             <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}>
               <AddressLink address={addr} highlight={highlightAddress} clipboard={false} />
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                {formatRunebase(value, 8)} RUNES
+              <Typography variant="body2" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap' }}>
+                <RunesAmount value={formatRunebase(value, 8)} />
               </Typography>
             </Box>
           ))}
@@ -152,7 +154,7 @@ export default function TransactionFlow({ transaction, highlightAddress = [] }) 
               {transfer.from ? <AddressLink address={transfer.from} highlight={highlightAddress} clipboard={false} /> : 'Mint'}
               <ArrowForwardIcon sx={{ fontSize: 14 }} color="action" />
               {transfer.to ? <AddressLink address={transfer.to} highlight={highlightAddress} clipboard={false} /> : 'Burn'}
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', ml: 'auto' }}>
+              <Typography variant="body2" sx={{ fontFamily: monoFontFamily, ml: 'auto' }}>
                 {formatRrc20(transfer.value, transfer.decimals)} {transfer.symbol || transfer.name || ''}
               </Typography>
             </Box>
@@ -166,7 +168,7 @@ export default function TransactionFlow({ transaction, highlightAddress = [] }) 
       {/* Fee */}
       {fees !== '0' && fees > 0 && (
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
-          {t('transaction.fee')} {formatRunebase(fees)} RUNES
+          {t('transaction.fee')} <RunesAmount value={formatRunebase(fees)} />
         </Typography>
       )}
 

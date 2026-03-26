@@ -22,6 +22,7 @@ import TableSkeleton from '@/components/TableSkeleton'
 import EmptyState from '@/components/EmptyState'
 import SortableTableHead from '@/components/SortableTableHead'
 import TableDensityToggle from '@/components/TableDensityToggle'
+import { monoFontFamily } from '../../theme'
 
 const hiddenOnMobile = { display: { xs: 'none', lg: 'table-cell' } }
 
@@ -35,7 +36,7 @@ function MobileTokenCard({ token, rank }) {
           <AddressLink address={token.address}>{token.name}</AddressLink>
         </Box>
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontFamily: 'monospace', mb: 0.25 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontFamily: monoFontFamily, mb: 0.25 }}>
         {formatRrc20(token.totalSupply, token.decimals, true)} {token.symbol || token.name || t('contract.token.tokens')}
       </Typography>
       <Box sx={{ display: 'flex', gap: 2 }}>
@@ -109,7 +110,7 @@ export default function TokenList() {
                 <TableRow key={token.address} sx={{ '&:hover': { bgcolor: 'action.selected' } }}>
                   <TableCell>{20 * (currentPage - 1) + index + 1}</TableCell>
                   <TableCell><AddressLink address={token.address}>{token.name}</AddressLink></TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                  <TableCell sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>
                     {formatRrc20(token.totalSupply, token.decimals, true)} {token.symbol || token.name || t('contract.token.tokens')}
                   </TableCell>
                   <TableCell>{token.transactions}</TableCell>

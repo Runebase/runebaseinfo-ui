@@ -17,20 +17,21 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Pagination from '@/components/Pagination'
 import AddressLink from '@/components/links/AddressLink'
+import { monoFontFamily } from '../../theme'
 
 function MobileRichCard({ address, balance, rank, percentage, qrc20 }) {
   return (
     <Paper variant="outlined" sx={{ p: 1.5, mb: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
         <Chip label={`#${rank}`} size="small" variant="outlined" />
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
           {percentage}%
         </Typography>
       </Box>
       <Box sx={{ mb: 0.25 }}>
         <AddressLink address={address} />
       </Box>
-      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+      <Typography variant="body2" sx={{ fontFamily: monoFontFamily }}>
         {formatRrc20(balance, qrc20.decimals)} {qrc20.symbol}
       </Typography>
     </Paper>
@@ -86,8 +87,8 @@ export default function ContractRichList() {
                 <TableRow key={address}>
                   <TableCell>{100 * (currentPage - 1) + index + 1}</TableCell>
                   <TableCell><AddressLink address={address} /></TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{formatRrc20(balance, qrc20.decimals)} {qrc20.symbol}</TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace' }}>{new BigNumber(balance).dividedBy(qrc20.totalSupply).times(100).toFixed(4)}%</TableCell>
+                  <TableCell sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{formatRrc20(balance, qrc20.decimals)} {qrc20.symbol}</TableCell>
+                  <TableCell sx={{ fontFamily: monoFontFamily }}>{new BigNumber(balance).dividedBy(qrc20.totalSupply).times(100).toFixed(4)}%</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -20,6 +20,8 @@ import Pagination from '@/components/Pagination'
 import AddressLink from '@/components/links/AddressLink'
 import TableSkeleton from '@/components/TableSkeleton'
 import EmptyState from '@/components/EmptyState'
+import RunesAmount from '@/components/RunesAmount'
+import { monoFontFamily } from '../../theme'
 
 const stickyHead = { position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }
 
@@ -28,15 +30,15 @@ function MobileRichCard({ address, balance, rank, percentage }) {
     <Paper variant="outlined" sx={{ p: 1.5, mb: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
         <Chip label={`#${rank}`} size="small" variant="outlined" />
-        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+        <Typography variant="caption" sx={{ fontFamily: monoFontFamily }}>
           {percentage}%
         </Typography>
       </Box>
       <Box sx={{ mb: 0.25 }}>
         <AddressLink address={address} />
       </Box>
-      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-        {formatRunebase(balance, 8)} RUNES
+      <Typography variant="body2" sx={{ fontFamily: monoFontFamily }}>
+        <RunesAmount value={formatRunebase(balance, 8)} />
       </Typography>
     </Paper>
   )
@@ -61,7 +63,7 @@ export default function RichList() {
     return supply + (h - 5000) * 100e8
   })()
 
-  document.title = t('misc.rich_list_title') + ' - explorer.runebase.io'
+  document.title = t('misc.rich_list_title') + ' - RuneBase Explorer'
 
   function getLink(page) { return `/misc/rich-list?page=${page}` }
 
@@ -100,8 +102,8 @@ export default function RichList() {
                 <TableRow key={address} sx={{ '&:hover': { bgcolor: 'action.selected' } }}>
                   <TableCell>{100 * (currentPage - 1) + index + 1}</TableCell>
                   <TableCell><AddressLink address={address} /></TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{formatRunebase(balance, 8)} RUNES</TableCell>
-                  <TableCell sx={{ fontFamily: 'monospace' }}>{new BigNumber(balance).dividedBy(totalSupply).times(100).toFixed(4)}%</TableCell>
+                  <TableCell sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}><RunesAmount value={formatRunebase(balance, 8)} /></TableCell>
+                  <TableCell sx={{ fontFamily: monoFontFamily }}>{new BigNumber(balance).dividedBy(totalSupply).times(100).toFixed(4)}%</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -20,7 +20,7 @@ export default function RawTx() {
   const [sendRawTransaction] = useSendRawTransactionMutation()
 
   useEffect(() => {
-    document.title = 'Send Raw Transaction - explorer.runebase.io'
+    document.title = 'Send Raw Transaction - RuneBase Explorer'
     const onMempool = (tx) => {
       if (tx.id === txId) setTransaction(tx)
     }

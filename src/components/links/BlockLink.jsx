@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router'
 import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
+import { monoFontFamily } from '../../theme'
 
 export default function BlockLink({ block, plain = false, clipboard = true, children }) {
   const display = children || block.toString()
@@ -17,9 +18,9 @@ export default function BlockLink({ block, plain = false, clipboard = true, chil
       }}
     >
       {plain ? (
-        <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
+        <Box component="span" sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{display}</Box>
       ) : (
-        <Box component={Link} to={`/block/${block}`} sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{display}</Box>
+        <Box component={Link} to={`/block/${block}`} sx={{ fontFamily: monoFontFamily, wordBreak: 'break-all' }}>{display}</Box>
       )}
       {clipboard && <Clipboard string={clipboardStr} />}
     </Box>

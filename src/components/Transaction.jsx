@@ -20,6 +20,8 @@ import SearchIcon from '@mui/icons-material/Search'
 import AddressLink from './links/AddressLink'
 import BlockLink from './links/BlockLink'
 import TransactionLink from './links/TransactionLink'
+import RunesAmount from './RunesAmount'
+import { monoFontFamily } from '../theme'
 
 function runebaseScript(asm) {
   let chunks = asm.split(' ')
@@ -156,8 +158,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
                     <Typography variant="body2" component="span">{t('transaction.unparsed_address')}</Typography>
                   )}
                 </Box>
-                <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                  {formatRunebase(input.value, 8)} RUNES
+                <Typography variant="caption" sx={{ fontFamily: monoFontFamily, color: 'text.secondary' }}>
+                  <RunesAmount value={formatRunebase(input.value, 8)} />
                 </Typography>
               </>
             )}
@@ -188,8 +190,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
               )}
             </Box>
             {output.value !== '0' && (
-              <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                {formatRunebase(output.value, 8)} RUNES
+              <Typography variant="caption" sx={{ fontFamily: monoFontFamily, color: 'text.secondary' }}>
+                <RunesAmount value={formatRunebase(output.value, 8)} />
               </Typography>
             )}
             {output.value === '0' && contractInfo[index] && (
@@ -207,8 +209,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             <Typography variant="caption" color="text.secondary">{t('transaction.gas_refund')}</Typography>
             <Box sx={{ py: 0.25 }}>
               <AddressLink address={inputs[0].address} highlight={highlightAddress} clipboard={false} />
-              <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
-                {formatRunebase(refundValue, 8)} RUNES
+              <Typography variant="caption" sx={{ fontFamily: monoFontFamily, display: 'block' }}>
+                <RunesAmount value={formatRunebase(refundValue, 8)} />
               </Typography>
             </Box>
           </>
@@ -220,8 +222,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             {spend.inputs.map((input, j) => (
               <Box key={j} sx={{ py: 0.25 }}>
                 <AddressLink address={input.address} highlight={highlightAddress} clipboard={false} />
-                <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
-                  {formatRunebase(input.value, 8)} RUNES
+                <Typography variant="caption" sx={{ fontFamily: monoFontFamily, display: 'block' }}>
+                  <RunesAmount value={formatRunebase(input.value, 8)} />
                 </Typography>
               </Box>
             ))}
@@ -231,8 +233,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             {spend.outputs.map((output, j) => (
               <Box key={j} sx={{ py: 0.25 }}>
                 <AddressLink address={output.address} highlight={highlightAddress} clipboard={false} />
-                <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
-                  {formatRunebase(output.value, 8)} RUNES
+                <Typography variant="caption" sx={{ fontFamily: monoFontFamily, display: 'block' }}>
+                  <RunesAmount value={formatRunebase(output.value, 8)} />
                 </Typography>
               </Box>
             ))}
@@ -253,7 +255,7 @@ export default function Transaction({ transaction, detailed = false, highlightAd
               {transfer.to ? (
                 <>
                   <AddressLink address={transfer.to} highlight={highlightAddress} />
-                  <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                  <Typography variant="caption" sx={{ fontFamily: monoFontFamily, display: 'block' }}>
                     {formatRrc20(transfer.value, transfer.decimals)}{' '}
                     <AddressLink address={transfer.address} highlight={highlightAddress}>
                       {transfer.symbol || transfer.name || t('contract.token.tokens')}
@@ -279,7 +281,7 @@ export default function Transaction({ transaction, detailed = false, highlightAd
               {transfer.to ? (
                 <>
                   <AddressLink address={transfer.to} highlight={highlightAddress} />
-                  <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                  <Typography variant="caption" sx={{ fontFamily: monoFontFamily, display: 'block' }}>
                     <AddressLink address={transfer.address} highlight={highlightAddress}>
                       {transfer.symbol || transfer.name || t('contract.token.tokens')}
                     </AddressLink>
@@ -296,11 +298,11 @@ export default function Transaction({ transaction, detailed = false, highlightAd
           <Box sx={{ textAlign: 'right', pt: 0.5, borderTop: '1px solid', borderColor: 'divider', mt: 0.5 }}>
             {fees > 0 ? (
               <Typography variant="caption">
-                {t('transaction.fee')} <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(fees)} RUNES</Box>
+                {t('transaction.fee')} <Box component="span" sx={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(fees)} /></Box>
               </Typography>
             ) : fees < 0 ? (
               <Typography variant="caption">
-                {t('transaction.reward')} <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(-fees)} RUNES</Box>
+                {t('transaction.reward')} <Box component="span" sx={{ fontFamily: monoFontFamily }}><RunesAmount value={formatRunebase(-fees)} /></Box>
               </Typography>
             ) : null}
           </Box>
@@ -379,11 +381,11 @@ export default function Transaction({ transaction, detailed = false, highlightAd
                     <span>{t('transaction.unparsed_address')}</span>
                   )}
                 </Box>
-                <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
                   <TransactionLink transaction={input.prevTxId} clipboard={false}>
                     <SearchIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle' }} />
                   </TransactionLink>
-                  {' '}{formatRunebase(input.value, 8)} RUNES
+                  {' '}<RunesAmount value={formatRunebase(input.value, 8)} />
                 </Box>
               </>
             )}
@@ -410,13 +412,13 @@ export default function Transaction({ transaction, detailed = false, highlightAd
               )}
             </Box>
             {output.value !== '0' && (
-              <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
                 {output.spentTxId && (
                   <TransactionLink transaction={output.spentTxId} clipboard={false}>
                     <SearchIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle' }} />
                   </TransactionLink>
                 )}
-                {' '}{formatRunebase(output.value, 8)} RUNES
+                {' '}<RunesAmount value={formatRunebase(output.value, 8)} />
               </Box>
             )}
             {output.value === '0' && contractInfo[index] && (
@@ -436,8 +438,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
           <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
             <AddressLink address={inputs[0].address} highlight={highlightAddress} clipboard={false} />
           </Box>
-          <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            {formatRunebase(refundValue, 8)} RUNES
+          <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <RunesAmount value={formatRunebase(refundValue, 8)} />
           </Box>
         </Box>
       )}
@@ -450,8 +452,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
               <AddressLink address={input.address} highlight={highlightAddress} clipboard={false} />
             </Box>
-            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
-              {formatRunebase(input.value, 8)} RUNES
+            <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <RunesAmount value={formatRunebase(input.value, 8)} />
             </Box>
           </Box>
         )),
@@ -460,8 +462,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
               <AddressLink address={output.address} highlight={highlightAddress} clipboard={false} />
             </Box>
-            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
-              {formatRunebase(output.value, 8)} RUNES
+            <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <RunesAmount value={formatRunebase(output.value, 8)} />
             </Box>
           </Box>
         ))
@@ -478,7 +480,7 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
               <AddressLink address={transfer.to} highlight={highlightAddress} />
             </Box>
-            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
               {formatRrc20(transfer.value, transfer.decimals)}{' '}
               <AddressLink address={transfer.address} highlight={highlightAddress}>
                 {transfer.symbol || transfer.name || t('contract.token.tokens')}
@@ -499,7 +501,7 @@ export default function Transaction({ transaction, detailed = false, highlightAd
             <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
               <AddressLink address={transfer.to} highlight={highlightAddress} />
             </Box>
-            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <Box component="span" sx={{ fontFamily: monoFontFamily, whiteSpace: 'nowrap', flexShrink: 0 }}>
               <AddressLink address={transfer.address} highlight={highlightAddress}>
                 {transfer.symbol || transfer.name || t('contract.token.tokens')}
               </AddressLink>
@@ -513,9 +515,9 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       {fees !== '0' && (
         <Grid size={12} sx={{ textAlign: 'right', pb: 0.25 }}>
           {fees > 0 ? (
-            <>{t('transaction.fee')} <Box component="span" sx={{ fontFamily: 'monospace', ml: 0.5 }}>{formatRunebase(fees)} RUNES</Box></>
+            <>{t('transaction.fee')} <Box component="span" sx={{ fontFamily: monoFontFamily, ml: 0.5 }}><RunesAmount value={formatRunebase(fees)} /></Box></>
           ) : fees < 0 ? (
-            <>{t('transaction.reward')} <Box component="span" sx={{ fontFamily: 'monospace', ml: 0.5 }}>{formatRunebase(-fees)} RUNES</Box></>
+            <>{t('transaction.reward')} <Box component="span" sx={{ fontFamily: monoFontFamily, ml: 0.5 }}><RunesAmount value={formatRunebase(-fees)} /></Box></>
           ) : null}
         </Grid>
       )}

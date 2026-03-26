@@ -59,10 +59,9 @@ export default function Nav({ onSearchOpen }) {
           <Box
             component={Link}
             to="/"
-            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'text.primary', fontSize: '1rem', fontWeight: 'bold' }}
+            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'text.primary' }}
           >
-            <span className="runebase-icon runebase-icon--runebase" style={{ marginRight: '0.3em' }} />
-            explorer.runebase.io
+            <Box component="img" src="/images/RuneBase.png" alt="RuneBase Explorer" sx={{ height: 28 }} />
           </Box>
           {themeToggle}
         </Toolbar>
@@ -77,10 +76,9 @@ export default function Nav({ onSearchOpen }) {
         <Box
           component={Link}
           to="/"
-          sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'text.primary', fontSize: '1.1rem', fontWeight: 'bold', mr: 3 }}
+          sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'text.primary', mr: 3 }}
         >
-          <span className="runebase-icon runebase-icon--runebase" style={{ marginRight: '0.3em' }} />
-          explorer.runebase.io
+          <Box component="img" src="/images/RuneBase.png" alt="RuneBase Explorer" sx={{ height: 36 }} />
         </Box>
         <Button component={Link} to="/block" color="inherit" sx={{ textTransform: 'uppercase', fontSize: '0.8rem' }}>
           {t('blockchain.block_plural')}
