@@ -1,10 +1,13 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
+import { useResponsive } from '@/hooks/useResponsive'
+import { truncateHash } from '@/utils/format'
 
 export default function TransactionLink({ transaction, plain = false, clipboard = true, children }) {
-  const display = children || transaction.toString()
+  const { isPhone } = useResponsive()
+  const display = children || (isPhone ? truncateHash(transaction.toString(), 10, 6) : transaction.toString())
   const clipboardStr = (clipboard === true ? transaction : clipboard).toString()
 
   return (

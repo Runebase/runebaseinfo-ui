@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom'
+import { Link as RouterLink, useLocation, useParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs'
 import MuiLink from '@mui/material/Link'

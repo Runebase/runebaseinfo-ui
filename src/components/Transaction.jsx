@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useWebSocket } from '@/hooks/useWebSocket'
+import { useResponsive } from '@/hooks/useResponsive'
 import { formatRunebase, formatRrc20, formatTimestamp } from '@/utils/format'
-import TransactionModel from '@/models/transaction'
+import { useLazyGetTransactionQuery } from '@/store/api'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import SearchIcon from '@mui/icons-material/Search'
 import AddressLink from './links/AddressLink'
 import BlockLink from './links/BlockLink'
@@ -34,6 +38,8 @@ export default function Transaction({ transaction, detailed = false, highlightAd
   const { t } = useTranslation()
   const blockchainHeight = useSelector(state => state.blockchain.height)
   const { subscribe, unsubscribe } = useWebSocket()
+  const { isPhone } = useResponsive()
+  const [triggerGetTransaction] = useLazyGetTransactionQuery()
   const [collapsed, setCollapsed] = useState(!detailed)
   const [showByteCode, setShowByteCode] = useState(() => transaction.outputs.map(() => false))
   const subscribingRef = useRef(false)
@@ -71,10 +77,10 @@ export default function Transaction({ transaction, detailed = false, highlightAd
 
   const onTransaction = useCallback(async (confirmedId) => {
     if (onTransactionChange) {
-      const tx = await TransactionModel.get(confirmedId)
+      const tx = await triggerGetTransaction(confirmedId).unwrap()
       onTransactionChange(tx)
     }
-  }, [id, onTransactionChange])
+  }, [id, onTransactionChange, triggerGetTransaction])
 
   useEffect(() => {
     if (transaction.confirmations) return
@@ -95,6 +101,215 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       }).join(',\n') + '\n)'
   }
 
+  // Mobile stacked layout
+  if (isPhone) {
+    return (
+      <Box sx={{ borderTop: '1px solid', borderColor: 'divider', py: 1, px: 0.5 }}>
+        {/* Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {detailed && (
+              <IconButton size="small" onClick={() => setCollapsed(!collapsed)} sx={{ p: 0 }}>
+                {collapsed ? <ChevronRightIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+              </IconButton>
+            )}
+            <TransactionLink transaction={id} />
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {confirmations ? (
+              <Chip
+                component={Link}
+                to={`/block/${blockHeight}`}
+                label={`${confirmations} conf`}
+                size="small"
+                color={confirmations >= 10 ? 'success' : 'default'}
+                clickable
+                sx={{ textDecoration: 'none', height: 22, fontSize: '0.7rem' }}
+              />
+            ) : (
+              <Chip label="Unconf" size="small" color="error" sx={{ height: 22, fontSize: '0.7rem' }} />
+            )}
+          </Box>
+        </Box>
+
+        {timestamp && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+            {formatTimestamp(timestamp)}
+          </Typography>
+        )}
+
+        {/* From section */}
+        <Typography variant="caption" fontWeight="bold" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+          From
+        </Typography>
+        {inputs.map((input, i) => (
+          <Box key={i} sx={{ py: 0.25 }}>
+            {input.coinbase ? (
+              <Typography variant="body2">{t('transaction.coinbase_input')}</Typography>
+            ) : (
+              <>
+                <Box>
+                  {input.address ? (
+                    <AddressLink address={input.address}
+                      plain={input.isInvalidContract} highlight={highlightAddress} clipboard={false} />
+                  ) : (
+                    <Typography variant="body2" component="span">{t('transaction.unparsed_address')}</Typography>
+                  )}
+                </Box>
+                <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                  {formatRunebase(input.value, 8)} RUNES
+                </Typography>
+              </>
+            )}
+          </Box>
+        ))}
+
+        {/* Arrow divider */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.25 }}>
+          <ArrowDownwardIcon fontSize="small" color="action" />
+        </Box>
+
+        {/* To section */}
+        <Typography variant="caption" fontWeight="bold" color="text.secondary" sx={{ display: 'block' }}>
+          To
+        </Typography>
+        {outputs.map((output, index) => (
+          <Box key={index} sx={{ py: 0.25 }}>
+            <Box>
+              {output.address ? (
+                <AddressLink address={output.address}
+                  plain={output.isInvalidContract} highlight={highlightAddress} clipboard={false} />
+              ) : output.scriptPubKey.type === 'empty' ? (
+                <Typography variant="body2" component="span">{t('transaction.empty_output')}</Typography>
+              ) : output.scriptPubKey.type === 'nulldata' ? (
+                <Typography variant="body2" component="span">{t('transaction.op_return_output')}</Typography>
+              ) : (
+                <Typography variant="body2" component="span">{t('transaction.unparsed_address')}</Typography>
+              )}
+            </Box>
+            {output.value !== '0' && (
+              <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                {formatRunebase(output.value, 8)} RUNES
+              </Typography>
+            )}
+            {output.value === '0' && contractInfo[index] && (
+              <Typography variant="caption" color="text.secondary">
+                {t('transaction.script.contract_' + contractInfo[index].type)}
+              </Typography>
+            )}
+          </Box>
+        ))}
+
+        {/* Gas Refund */}
+        {refundValue !== '0' && (
+          <>
+            <Divider sx={{ my: 0.5 }} />
+            <Typography variant="caption" color="text.secondary">{t('transaction.gas_refund')}</Typography>
+            <Box sx={{ py: 0.25 }}>
+              <AddressLink address={inputs[0].address} highlight={highlightAddress} clipboard={false} />
+              <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                {formatRunebase(refundValue, 8)} RUNES
+              </Typography>
+            </Box>
+          </>
+        )}
+
+        {/* Contract Spends */}
+        {contractSpends.map((spend, i) => (
+          <Box key={'cs-' + i} sx={{ borderTop: '1px solid', borderColor: 'divider', mt: 0.5, pt: 0.5 }}>
+            {spend.inputs.map((input, j) => (
+              <Box key={j} sx={{ py: 0.25 }}>
+                <AddressLink address={input.address} highlight={highlightAddress} clipboard={false} />
+                <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                  {formatRunebase(input.value, 8)} RUNES
+                </Typography>
+              </Box>
+            ))}
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.25 }}>
+              <ArrowDownwardIcon fontSize="small" color="action" />
+            </Box>
+            {spend.outputs.map((output, j) => (
+              <Box key={j} sx={{ py: 0.25 }}>
+                <AddressLink address={output.address} highlight={highlightAddress} clipboard={false} />
+                <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                  {formatRunebase(output.value, 8)} RUNES
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        ))}
+
+        {/* RRC20 Token Transfers */}
+        {qrc20TokenTransfers.map((transfer, i) => (
+          <Box key={'qrc20-' + i} sx={{ borderTop: '1px solid', borderColor: 'divider', mt: 0.5, pt: 0.5 }}>
+            <Typography variant="caption" fontWeight="bold" color="text.secondary">Token Transfer</Typography>
+            <Box sx={{ py: 0.25 }}>
+              {transfer.from ? <AddressLink address={transfer.from} highlight={highlightAddress} /> : t('contract.token.mint_tokens')}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.25 }}>
+              <ArrowDownwardIcon fontSize="small" color="action" />
+            </Box>
+            <Box sx={{ py: 0.25 }}>
+              {transfer.to ? (
+                <>
+                  <AddressLink address={transfer.to} highlight={highlightAddress} />
+                  <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                    {formatRrc20(transfer.value, transfer.decimals)}{' '}
+                    <AddressLink address={transfer.address} highlight={highlightAddress}>
+                      {transfer.symbol || transfer.name || t('contract.token.tokens')}
+                    </AddressLink>
+                  </Typography>
+                </>
+              ) : t('contract.token.burn_tokens')}
+            </Box>
+          </Box>
+        ))}
+
+        {/* RRC721 Token Transfers */}
+        {qrc721TokenTransfers.map((transfer, i) => (
+          <Box key={'qrc721-' + i} sx={{ borderTop: '1px solid', borderColor: 'divider', mt: 0.5, pt: 0.5 }}>
+            <Typography variant="caption" fontWeight="bold" color="text.secondary">NFT Transfer</Typography>
+            <Box sx={{ py: 0.25 }}>
+              {transfer.from ? <AddressLink address={transfer.from} highlight={highlightAddress} /> : t('contract.token.mint_tokens')}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.25 }}>
+              <ArrowDownwardIcon fontSize="small" color="action" />
+            </Box>
+            <Box sx={{ py: 0.25 }}>
+              {transfer.to ? (
+                <>
+                  <AddressLink address={transfer.to} highlight={highlightAddress} />
+                  <Typography variant="caption" sx={{ fontFamily: 'monospace', display: 'block' }}>
+                    <AddressLink address={transfer.address} highlight={highlightAddress}>
+                      {transfer.symbol || transfer.name || t('contract.token.tokens')}
+                    </AddressLink>
+                    {' '}#0x{transfer.tokenId.replace(/^0+/, '') || '0'}
+                  </Typography>
+                </>
+              ) : t('contract.token.burn_tokens')}
+            </Box>
+          </Box>
+        ))}
+
+        {/* Fees */}
+        {fees !== '0' && (
+          <Box sx={{ textAlign: 'right', pt: 0.5, borderTop: '1px solid', borderColor: 'divider', mt: 0.5 }}>
+            {fees > 0 ? (
+              <Typography variant="caption">
+                {t('transaction.fee')} <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(fees)} RUNES</Box>
+              </Typography>
+            ) : fees < 0 ? (
+              <Typography variant="caption">
+                {t('transaction.reward')} <Box component="span" sx={{ fontFamily: 'monospace' }}>{formatRunebase(-fees)} RUNES</Box>
+              </Typography>
+            ) : null}
+          </Box>
+        )}
+      </Box>
+    )
+  }
+
+  // Desktop layout (original grid-based)
   const arrowColumn = (
     <Grid size="auto" sx={{ display: 'flex', alignItems: 'center', px: 1 }}>
       <ArrowForwardIcon fontSize="small" color="action" />
@@ -105,9 +320,9 @@ export default function Transaction({ transaction, detailed = false, highlightAd
     return (
       <React.Fragment key={key}>
         <Grid size={12} sx={{ p: 0 }} />
-        <Grid size="grow">{inputContent}</Grid>
+        <Grid size="grow" sx={{ minWidth: 0 }}>{inputContent}</Grid>
         {arrowColumn}
-        <Grid size={{ xs: 12, md: 6 }}>{outputContent}</Grid>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>{outputContent}</Grid>
       </React.Fragment>
     )
   }
@@ -149,20 +364,22 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       </Grid>
 
       {/* Inputs */}
-      <Grid size="grow">
+      <Grid size="grow" sx={{ minWidth: 0 }}>
         {inputs.map((input, i) => (
           <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
             {input.coinbase ? (
               <span>{t('transaction.coinbase_input')}</span>
             ) : (
               <>
-                {input.address ? (
-                  <AddressLink address={input.address}
-                    plain={input.isInvalidContract} highlight={highlightAddress} clipboard={false} />
-                ) : (
-                  <span>{t('transaction.unparsed_address')}</span>
-                )}
-                <Box component="span" sx={{ fontFamily: 'monospace' }}>
+                <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+                  {input.address ? (
+                    <AddressLink address={input.address}
+                      plain={input.isInvalidContract} highlight={highlightAddress} clipboard={false} />
+                  ) : (
+                    <span>{t('transaction.unparsed_address')}</span>
+                  )}
+                </Box>
+                <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   <TransactionLink transaction={input.prevTxId} clipboard={false}>
                     <SearchIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle' }} />
                   </TransactionLink>
@@ -177,21 +394,23 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       {arrowColumn}
 
       {/* Outputs */}
-      <Grid size={{ xs: 12, md: 6 }}>
+      <Grid size={{ xs: 12, md: 6 }} sx={{ minWidth: 0 }}>
         {outputs.map((output, index) => (
           <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            {output.address ? (
-              <AddressLink address={output.address}
-                plain={output.isInvalidContract} highlight={highlightAddress} clipboard={false} />
-            ) : output.scriptPubKey.type === 'empty' ? (
-              <span>{t('transaction.empty_output')}</span>
-            ) : output.scriptPubKey.type === 'nulldata' ? (
-              <span>{t('transaction.op_return_output')}</span>
-            ) : (
-              <span>{t('transaction.unparsed_address')}</span>
-            )}
+            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+              {output.address ? (
+                <AddressLink address={output.address}
+                  plain={output.isInvalidContract} highlight={highlightAddress} clipboard={false} />
+              ) : output.scriptPubKey.type === 'empty' ? (
+                <span>{t('transaction.empty_output')}</span>
+              ) : output.scriptPubKey.type === 'nulldata' ? (
+                <span>{t('transaction.op_return_output')}</span>
+              ) : (
+                <span>{t('transaction.unparsed_address')}</span>
+              )}
+            </Box>
             {output.value !== '0' && (
-              <Box component="span" sx={{ fontFamily: 'monospace' }}>
+              <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
                 {output.spentTxId && (
                   <TransactionLink transaction={output.spentTxId} clipboard={false}>
                     <SearchIcon sx={{ fontSize: '0.85rem', verticalAlign: 'middle' }} />
@@ -213,9 +432,11 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       {refundValue !== '0' && renderTransferRow(
         'refund',
         <span>{t('transaction.gas_refund')}</span>,
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <AddressLink address={inputs[0].address} highlight={highlightAddress} clipboard={false} />
-          <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+            <AddressLink address={inputs[0].address} highlight={highlightAddress} clipboard={false} />
+          </Box>
+          <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
             {formatRunebase(refundValue, 8)} RUNES
           </Box>
         </Box>
@@ -225,17 +446,21 @@ export default function Transaction({ transaction, detailed = false, highlightAd
       {contractSpends.map((spend, i) => renderTransferRow(
         'cs-' + i,
         spend.inputs.map((input, j) => (
-          <Box key={j} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <AddressLink address={input.address} highlight={highlightAddress} clipboard={false} />
-            <Box component="span" sx={{ fontFamily: 'monospace' }}>
+          <Box key={j} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+              <AddressLink address={input.address} highlight={highlightAddress} clipboard={false} />
+            </Box>
+            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {formatRunebase(input.value, 8)} RUNES
             </Box>
           </Box>
         )),
         spend.outputs.map((output, j) => (
-          <Box key={j} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <AddressLink address={output.address} highlight={highlightAddress} clipboard={false} />
-            <Box component="span" sx={{ fontFamily: 'monospace' }}>
+          <Box key={j} sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+              <AddressLink address={output.address} highlight={highlightAddress} clipboard={false} />
+            </Box>
+            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {formatRunebase(output.value, 8)} RUNES
             </Box>
           </Box>
@@ -249,9 +474,11 @@ export default function Transaction({ transaction, detailed = false, highlightAd
           <AddressLink address={transfer.from} highlight={highlightAddress} />
         ) : t('contract.token.mint_tokens'),
         transfer.to ? (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <AddressLink address={transfer.to} highlight={highlightAddress} />
-            <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+              <AddressLink address={transfer.to} highlight={highlightAddress} />
+            </Box>
+            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {formatRrc20(transfer.value, transfer.decimals)}{' '}
               <AddressLink address={transfer.address} highlight={highlightAddress}>
                 {transfer.symbol || transfer.name || t('contract.token.tokens')}
@@ -268,9 +495,11 @@ export default function Transaction({ transaction, detailed = false, highlightAd
           <AddressLink address={transfer.from} highlight={highlightAddress} />
         ) : t('contract.token.mint_tokens'),
         transfer.to ? (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <AddressLink address={transfer.to} highlight={highlightAddress} />
-            <Box component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <Box component="span" sx={{ minWidth: 0, overflow: 'hidden' }}>
+              <AddressLink address={transfer.to} highlight={highlightAddress} />
+            </Box>
+            <Box component="span" sx={{ fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>
               <AddressLink address={transfer.address} highlight={highlightAddress}>
                 {transfer.symbol || transfer.name || t('contract.token.tokens')}
               </AddressLink>

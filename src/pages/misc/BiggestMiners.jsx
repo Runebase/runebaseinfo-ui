@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import React from 'react'
+import BigNumber from 'bignumber.js'
+import { useSearchParams } from 'react-router'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useGetBiggestMinersQuery } from '@/store/api'
 import { formatRunebase } from '@/utils/format'
-import MiscModel from '@/models/misc'
+import { useResponsive } from '@/hooks/useResponsive'
+import Box from '@mui/material/Box'
 import Table from '@mui/material/Table'
 import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
@@ -11,57 +14,103 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
+import Chip from '@mui/material/Chip'
 import Pagination from '@/components/Pagination'
 import AddressLink from '@/components/links/AddressLink'
+import TableSkeleton from '@/components/TableSkeleton'
+import EmptyState from '@/components/EmptyState'
 
 const hiddenOnMobile = { display: { xs: 'none', lg: 'table-cell' } }
+const stickyHead = { position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }
+
+function MobileMinerCard({ address, blocks, balance, rank, percentage }) {
+  return (
+    <Paper variant="outlined" sx={{ p: 1.5, mb: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+        <Chip label={`#${rank}`} size="small" variant="outlined" />
+        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+          {percentage}%
+        </Typography>
+      </Box>
+      <Box sx={{ mb: 0.25 }}>
+        <AddressLink address={address} />
+      </Box>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <Typography variant="caption" color="text.secondary">
+          {blocks} blocks
+        </Typography>
+        <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+          {formatRunebase(balance, 8)} RUNES
+        </Typography>
+      </Box>
+    </Paper>
+  )
+}
 
 export default function BiggestMiners() {
   const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const blockchain = useSelector(state => state.blockchain)
-  const [totalCount, setTotalCount] = useState(0)
-  const [list, setList] = useState([])
+  const { isPhone } = useResponsive()
   const currentPage = Number(searchParams.get('page') || 1)
-  const pages = Math.ceil(totalCount / 100)
   const posBlocks = blockchain.height - 5000
 
-  useEffect(() => {
-    document.title = t('misc.biggest_miners_title') + ' - explorer.runebase.io'
-    MiscModel.biggestMiners({ from: (currentPage - 1) * 100, to: currentPage * 100 })
-      .then(({ totalCount: tc, list: l }) => { setTotalCount(tc); setList(l) })
-      .catch(() => {})
-  }, [currentPage])
+  const { data, isFetching, isError } = useGetBiggestMinersQuery({ from: (currentPage - 1) * 100, to: currentPage * 100 })
+  const totalCount = data?.totalCount || 0
+  const list = data?.list
+  const pages = Math.ceil(totalCount / 100)
+
+  document.title = t('misc.biggest_miners_title') + ' - explorer.runebase.io'
 
   function getLink(page) { return `/misc/biggest-miners?page=${page}` }
 
   return (
     <div>
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
-      <TableContainer component={Paper} variant="outlined" sx={{ my: 0.5 }}>
-        <Table size="small" sx={{ '& tbody tr:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('misc.ranking')}</TableCell>
-              <TableCell>{t('misc.address')}</TableCell>
-              <TableCell>{t('misc.blocks_mined')}</TableCell>
-              <TableCell>{t('misc.percentage')}</TableCell>
-              <TableCell sx={hiddenOnMobile}>{t('misc.balance')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.map(({ address, blocks, balance }, index) => (
-              <TableRow key={address}>
-                <TableCell>{100 * (currentPage - 1) + index + 1}</TableCell>
-                <TableCell><AddressLink address={address} /></TableCell>
-                <TableCell>{blocks}</TableCell>
-                <TableCell sx={{ fontFamily: 'monospace' }}>{(blocks / posBlocks * 100).toFixed(4)}%</TableCell>
-                <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{formatRunebase(balance, 8)}</TableCell>
+      {isFetching || !list ? (
+        <TableSkeleton rows={20} cols={isPhone ? 3 : 5} />
+      ) : list.length === 0 || isError ? (
+        <EmptyState message="No miners found" />
+      ) : isPhone ? (
+        <Box>
+          {list.map(({ address, blocks, balance }, index) => (
+            <MobileMinerCard
+              key={address}
+              address={address}
+              blocks={blocks}
+              balance={balance}
+              rank={100 * (currentPage - 1) + index + 1}
+              percentage={new BigNumber(blocks).dividedBy(posBlocks).times(100).toFixed(4)}
+            />
+          ))}
+        </Box>
+      ) : (
+        <TableContainer component={Paper} variant="outlined" sx={{ my: 0.5 }}>
+          <Table size="small" sx={{ '& tbody tr:nth-of-type(odd)': { bgcolor: 'action.hover' } }}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={stickyHead}>{t('misc.ranking')}</TableCell>
+                <TableCell sx={stickyHead}>{t('misc.address')}</TableCell>
+                <TableCell sx={stickyHead}>{t('misc.blocks_mined')}</TableCell>
+                <TableCell sx={stickyHead}>{t('misc.percentage')}</TableCell>
+                <TableCell sx={{ ...hiddenOnMobile, ...stickyHead }}>{t('misc.balance')}</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {list.map(({ address, blocks, balance }, index) => (
+                <TableRow key={address} sx={{ '&:hover': { bgcolor: 'action.selected' } }}>
+                  <TableCell>{100 * (currentPage - 1) + index + 1}</TableCell>
+                  <TableCell><AddressLink address={address} /></TableCell>
+                  <TableCell>{blocks}</TableCell>
+                  <TableCell sx={{ fontFamily: 'monospace' }}>{new BigNumber(blocks).dividedBy(posBlocks).times(100).toFixed(4)}%</TableCell>
+                  <TableCell sx={{ ...hiddenOnMobile, fontFamily: 'monospace' }}>{formatRunebase(balance, 8)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       {pages > 1 && <Pagination pages={pages} currentPage={currentPage} getLink={getLink} />}
     </div>
   )

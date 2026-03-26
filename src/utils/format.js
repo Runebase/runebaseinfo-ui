@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 function addAmountDelimiters(string) {
   return string.replace(/^(\d{1,3})((\d{3})*)(\.\d+|)$/g, (_, before, middle, __, after) => {
     return before + middle.replace(/(\d{3})/g, ',$1') + after
@@ -5,11 +7,11 @@ function addAmountDelimiters(string) {
 }
 
 export function formatRunebase(satoshis, precision = null) {
+  const val = new BigNumber(satoshis).dividedBy(1e8)
   if (precision == null) {
-    let s = satoshis.toString().padStart(9, '0')
-    return addAmountDelimiters((s.slice(0, -8) + '.' + s.slice(-8)).replace(/\.?0*$/g, ''))
+    return addAmountDelimiters(val.toFixed().replace(/\.?0*$/g, ''))
   } else {
-    return addAmountDelimiters((satoshis / 1e8).toFixed(precision))
+    return addAmountDelimiters(val.toFixed(precision))
   }
 }
 
@@ -17,15 +19,24 @@ export function formatRrc20(amount, decimals = 0, showDecimals = false) {
   if (decimals === 0) {
     return amount
   }
-  let s = amount.toString().padStart(decimals + 1, '0')
-  let integralPart = s.slice(0, -decimals)
-  let decimalPart = s.slice(-decimals)
-  let value = addAmountDelimiters(integralPart + '.' + decimalPart)
+  const val = new BigNumber(amount).dividedBy(new BigNumber(10).pow(decimals))
+  const formatted = addAmountDelimiters(val.toFixed(decimals))
   if (showDecimals) {
-    return value
+    return formatted
   } else {
-    return value.replace(/\.?0*$/g, '')
+    return formatted.replace(/\.?0*$/g, '')
   }
+}
+
+/**
+ * Truncate a hex hash or address for display.
+ * truncateHash('abcdef1234567890', 6, 4) => 'abcdef...7890'
+ */
+export function truncateHash(hash, startChars = 8, endChars = 6) {
+  if (!hash) return ''
+  const str = hash.toString()
+  if (str.length <= startChars + endChars + 3) return str
+  return str.slice(0, startChars) + '...' + str.slice(-endChars)
 }
 
 export function formatTimestamp(time, type = 'datetime') {

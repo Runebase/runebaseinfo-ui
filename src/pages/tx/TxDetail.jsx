@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { useParams } from 'react-router'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useGetTransactionQuery } from '@/store/api'
 import { formatRunebase, formatTimestamp } from '@/utils/format'
-import TransactionModel from '@/models/transaction'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import Divider from '@mui/material/Divider'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 import SectionCard from '@/components/SectionCard'
 import InfoRow from '@/components/InfoRow'
@@ -17,21 +16,21 @@ import Transaction from '@/components/Transaction'
 import TransactionLink from '@/components/links/TransactionLink'
 import BlockLink from '@/components/links/BlockLink'
 import AddressLink from '@/components/links/AddressLink'
+import DetailSkeleton from '@/components/DetailSkeleton'
 
 export default function TxDetail() {
   const { t } = useTranslation()
   const { id: txId } = useParams()
   const blockchainHeight = useSelector(state => state.blockchain.height)
-  const [tx, setTx] = useState(null)
+  const { data: tx, refetch } = useGetTransactionQuery(txId)
 
   useEffect(() => {
-    TransactionModel.get(txId).then(data => {
-      setTx(data)
-      document.title = t('blockchain.transaction') + ' ' + data.id + ' - explorer.runebase.io'
-    }).catch(() => {})
-  }, [txId])
+    if (tx) {
+      document.title = t('blockchain.transaction') + ' ' + tx.id + ' - explorer.runebase.io'
+    }
+  }, [tx])
 
-  if (!tx) return <Container maxWidth="lg"><Typography>Loading...</Typography></Container>
+  if (!tx) return <Container maxWidth="lg"><DetailSkeleton rows={8} /></Container>
 
   const confirmations = tx.blockHeight == null ? 0 : blockchainHeight - tx.blockHeight + 1
   const receipts = tx.outputs.map(o => o.receipt).filter(Boolean)
@@ -43,8 +42,8 @@ export default function TxDetail() {
     }).join(',\n') + '\n)'
   }
 
-  function refresh(newTx) {
-    setTx(prev => ({ ...prev, ...newTx }))
+  function refresh() {
+    refetch()
   }
 
   return (

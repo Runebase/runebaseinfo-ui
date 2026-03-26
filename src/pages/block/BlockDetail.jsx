@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { useParams, useSearchParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
+import { useGetBlockWithTransactionsQuery } from '@/store/api'
 import { formatRunebase, formatTimestamp } from '@/utils/format'
-import BlockModel from '@/models/block'
-import TransactionModel from '@/models/transaction'
 import Container from '@mui/material/Container'
-import Typography from '@mui/material/Typography'
 import ViewInArIcon from '@mui/icons-material/ViewInAr'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 import SectionCard from '@/components/SectionCard'
@@ -15,29 +13,25 @@ import Pagination from '@/components/Pagination'
 import Transaction from '@/components/Transaction'
 import BlockLink from '@/components/links/BlockLink'
 import AddressLink from '@/components/links/AddressLink'
+import DetailSkeleton from '@/components/DetailSkeleton'
 
 export default function BlockDetail() {
   const { t } = useTranslation()
   const { id } = useParams()
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const [block, setBlock] = useState(null)
-  const [transactions, setTransactions] = useState([])
   const currentPage = Number(searchParams.get('page') || 1)
 
-  useEffect(() => {
-    BlockModel.get(id).then(async (b) => {
-      setBlock(b)
-      document.title = t('blockchain.block') + ' #' + b.height + ' - explorer.runebase.io'
-      const page = currentPage
-      const txs = await TransactionModel.getBrief(
-        b.transactions.slice((page - 1) * 20, page * 20)
-      )
-      setTransactions(txs)
-    }).catch(() => {})
-  }, [id, currentPage])
+  const { data } = useGetBlockWithTransactionsQuery({ id, page: currentPage, pageSize: 20 })
+  const block = data?.block
+  const transactions = data?.transactions || []
 
-  if (!block) return <Container maxWidth="lg"><Typography>Loading...</Typography></Container>
+  useEffect(() => {
+    if (block) {
+      document.title = t('blockchain.block') + ' #' + block.height + ' - explorer.runebase.io'
+    }
+  }, [block])
+
+  if (!block) return <Container maxWidth="lg"><DetailSkeleton rows={10} /></Container>
 
   const pages = Math.ceil(block.transactions.length / 20)
 

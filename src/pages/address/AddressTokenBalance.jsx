@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useSearchParams, useNavigate, useOutletContext } from 'react-router-dom'
+import React, { useState } from 'react'
+import { useParams, useSearchParams, useNavigate, useOutletContext } from 'react-router'
 import { useTranslation } from 'react-i18next'
+import { useGetAddressTokenBalanceTransactionsQuery } from '@/store/api'
 import { useResponsive } from '@/hooks/useResponsive'
 import { formatRrc20, formatTimestamp } from '@/utils/format'
-import Address from '@/models/address'
 import Box from '@mui/material/Box'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
@@ -26,17 +26,15 @@ export default function AddressTokenBalance() {
   const navigate = useNavigate()
   const { isTablet } = useResponsive()
   const { tokens = [] } = useOutletContext() || {}
-  const [totalCount, setTotalCount] = useState(0)
-  const [transactions, setTransactions] = useState([])
   const [selectedToken, setSelectedToken] = useState(searchParams.get('token') || '')
   const currentPage = Number(searchParams.get('page') || 1)
-  const pages = Math.ceil(totalCount / 100)
 
-  useEffect(() => {
-    Address.getTokenBalanceTransactions(id, { page: currentPage - 1, pageSize: 100, token: selectedToken || undefined })
-      .then(({ totalCount: tc, transactions: txs }) => { setTotalCount(tc); setTransactions(txs) })
-      .catch(() => {})
-  }, [id, currentPage, selectedToken])
+  const { data } = useGetAddressTokenBalanceTransactionsQuery({
+    id, page: currentPage - 1, pageSize: 100, token: selectedToken || undefined,
+  })
+  const totalCount = data?.totalCount || 0
+  const transactions = data?.transactions || []
+  const pages = Math.ceil(totalCount / 100)
 
   function getLink(page) {
     let q = `page=${page}`

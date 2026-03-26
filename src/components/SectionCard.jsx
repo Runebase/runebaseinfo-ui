@@ -4,8 +4,14 @@ import CardContent from '@mui/material/CardContent'
 import Avatar from '@mui/material/Avatar'
 
 export default function SectionCard({ icon, title, action, children, sx, ...props }) {
+  const titleId = title ? `section-${title.replace(/\s+/g, '-').toLowerCase()}` : undefined
   return (
-    <Card sx={{ mx: { xs: 0, md: '0.75em' }, my: '0.5em', ...sx }} {...props}>
+    <Card
+      sx={{ mx: { xs: 0, md: '0.75em' }, my: '0.5em', ...sx }}
+      role="region"
+      aria-labelledby={titleId}
+      {...props}
+    >
       {(title || icon) && (
         <CardHeader
           avatar={icon ? (
@@ -14,7 +20,7 @@ export default function SectionCard({ icon, title, action, children, sx, ...prop
             </Avatar>
           ) : undefined}
           title={title}
-          titleTypographyProps={{ variant: 'subtitle1', fontWeight: 'bold' }}
+          titleTypographyProps={{ variant: 'subtitle1', fontWeight: 'bold', id: titleId }}
           action={action}
           sx={{ pb: 0 }}
         />

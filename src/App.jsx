@@ -1,36 +1,49 @@
-import React, { useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import React, { lazy, Suspense, useEffect } from 'react'
+import { Routes, Route } from 'react-router'
 import { useDispatch } from 'react-redux'
 import Layout from './components/Layout'
-import Home from './pages/Home'
-import BlockList from './pages/block/BlockList'
-import BlockDetail from './pages/block/BlockDetail'
-import AddressDetail from './pages/address/AddressDetail'
-import AddressTransactions from './pages/address/AddressTransactions'
-import AddressBalance from './pages/address/AddressBalance'
-import AddressTokenBalance from './pages/address/AddressTokenBalance'
-import TxDetail from './pages/tx/TxDetail'
-import ContractDetail from './pages/contract/ContractDetail'
-import ContractTransactions from './pages/contract/ContractTransactions'
-import ContractRichList from './pages/contract/ContractRichList'
-import TokenList from './pages/contract/TokenList'
-import MiscLayout from './pages/misc/Misc'
-import Charts from './pages/misc/Charts'
-import RichList from './pages/misc/RichList'
-import BiggestMiners from './pages/misc/BiggestMiners'
-import StakeCalculator from './pages/misc/StakeCalculator'
-import RawTx from './pages/misc/RawTx'
-import NotFound from './pages/NotFound'
 import { setHeight } from './store/blockchainSlice'
 import { useWebSocket } from './hooks/useWebSocket'
-import MiscModel from './models/misc'
+import { useLazyGetInfoQuery } from './store/api'
+import Container from '@mui/material/Container'
+import LinearProgress from '@mui/material/LinearProgress'
+
+// Lazy-loaded page components
+const Home = lazy(() => import('./pages/Home'))
+const BlockList = lazy(() => import('./pages/block/BlockList'))
+const BlockDetail = lazy(() => import('./pages/block/BlockDetail'))
+const AddressDetail = lazy(() => import('./pages/address/AddressDetail'))
+const AddressTransactions = lazy(() => import('./pages/address/AddressTransactions'))
+const AddressBalance = lazy(() => import('./pages/address/AddressBalance'))
+const AddressTokenBalance = lazy(() => import('./pages/address/AddressTokenBalance'))
+const TxDetail = lazy(() => import('./pages/tx/TxDetail'))
+const ContractDetail = lazy(() => import('./pages/contract/ContractDetail'))
+const ContractTransactions = lazy(() => import('./pages/contract/ContractTransactions'))
+const ContractRichList = lazy(() => import('./pages/contract/ContractRichList'))
+const TokenList = lazy(() => import('./pages/contract/TokenList'))
+const MiscLayout = lazy(() => import('./pages/misc/Misc'))
+const Charts = lazy(() => import('./pages/misc/Charts'))
+const RichList = lazy(() => import('./pages/misc/RichList'))
+const BiggestMiners = lazy(() => import('./pages/misc/BiggestMiners'))
+const StakeCalculator = lazy(() => import('./pages/misc/StakeCalculator'))
+const RawTx = lazy(() => import('./pages/misc/RawTx'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+
+function SuspenseFallback() {
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <LinearProgress />
+    </Container>
+  )
+}
 
 function AppInit() {
   const dispatch = useDispatch()
   const { subscribe, unsubscribe } = useWebSocket()
+  const [triggerGetInfo] = useLazyGetInfoQuery()
 
   useEffect(() => {
-    MiscModel.info().then(({ height }) => {
+    triggerGetInfo().unwrap().then(({ height }) => {
       if (height) dispatch(setHeight(height))
     }).catch(() => {})
 
@@ -50,33 +63,35 @@ export default function App() {
   return (
     <>
       <AppInit />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="block" element={<BlockList />} />
-          <Route path="block/:id" element={<BlockDetail />} />
-          <Route path="address/:id" element={<AddressDetail />}>
-            <Route index element={<AddressTransactions />} />
-            <Route path="balance" element={<AddressBalance />} />
-            <Route path="token-balance" element={<AddressTokenBalance />} />
+      <Suspense fallback={<SuspenseFallback />}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="block" element={<BlockList />} />
+            <Route path="block/:id" element={<BlockDetail />} />
+            <Route path="address/:id" element={<AddressDetail />}>
+              <Route index element={<AddressTransactions />} />
+              <Route path="balance" element={<AddressBalance />} />
+              <Route path="token-balance" element={<AddressTokenBalance />} />
+            </Route>
+            <Route path="tx/:id" element={<TxDetail />} />
+            <Route path="contract/tokens" element={<TokenList />} />
+            <Route path="contract/:id" element={<ContractDetail />}>
+              <Route index element={<ContractTransactions />} />
+              <Route path="rich-list" element={<ContractRichList />} />
+            </Route>
+            <Route path="misc" element={<MiscLayout />}>
+              <Route index element={<Charts />} />
+              <Route path="charts" element={<Charts />} />
+              <Route path="rich-list" element={<RichList />} />
+              <Route path="biggest-miners" element={<BiggestMiners />} />
+              <Route path="stake-calculator" element={<StakeCalculator />} />
+              <Route path="raw-tx" element={<RawTx />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
           </Route>
-          <Route path="tx/:id" element={<TxDetail />} />
-          <Route path="contract/tokens" element={<TokenList />} />
-          <Route path="contract/:id" element={<ContractDetail />}>
-            <Route index element={<ContractTransactions />} />
-            <Route path="rich-list" element={<ContractRichList />} />
-          </Route>
-          <Route path="misc" element={<MiscLayout />}>
-            <Route index element={<Charts />} />
-            <Route path="charts" element={<Charts />} />
-            <Route path="rich-list" element={<RichList />} />
-            <Route path="biggest-miners" element={<BiggestMiners />} />
-            <Route path="stake-calculator" element={<StakeCalculator />} />
-            <Route path="raw-tx" element={<RawTx />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+        </Routes>
+      </Suspense>
     </>
   )
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { removeAddress, addAddress } from '@/store/addressSlice'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { formatRunebase } from '@/utils/format'
-import AddressModel from '@/models/address'
+import { useLazyGetAddressBalanceQuery } from '@/store/api'
 import Box from '@mui/material/Box'
 import Fab from '@mui/material/Fab'
 import Paper from '@mui/material/Paper'
@@ -17,12 +17,15 @@ import IconButton from '@mui/material/IconButton'
 import ContactsIcon from '@mui/icons-material/Contacts'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddressLink from './links/AddressLink'
+import { useResponsive } from '@/hooks/useResponsive'
 
 export default function MyAddresses() {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const addresses = useSelector(state => state.address.myAddresses)
   const { subscribe, unsubscribe } = useWebSocket()
+  const { isPhone } = useResponsive()
+  const [triggerGetBalance] = useLazyGetAddressBalanceQuery()
   const [list, setList] = useState([])
   const [show, setShow] = useState(false)
   const elRef = useRef(null)
@@ -58,7 +61,7 @@ export default function MyAddresses() {
     setList(newList)
     for (let item of newList) {
       subscribe('address/' + item.address, 'address/transaction', handler)
-      AddressModel.getBalance(item.address).then(
+      triggerGetBalance(item.address).unwrap().then(
         balance => setList(prev => prev.map(p => p.address === item.address ? { ...p, balance: String(balance) } : p)),
         () => {}
       )
@@ -83,8 +86,13 @@ export default function MyAddresses() {
   if (!addresses.length) return null
 
   return (
-    <Box ref={elRef} sx={{ position: 'fixed', zIndex: 100, bottom: '2em', right: '2em' }}>
-      <Fab color="primary" size="medium" onClick={() => setShow(!show)}>
+    <Box ref={elRef} sx={{
+      position: 'fixed',
+      zIndex: 100,
+      bottom: isPhone ? '4.5rem' : '2rem',
+      left: '1em',
+    }}>
+      <Fab color="primary" size="small" onClick={() => setShow(!show)}>
         <ContactsIcon />
       </Fab>
       {show && (
@@ -93,7 +101,7 @@ export default function MyAddresses() {
           sx={{
             position: 'absolute',
             bottom: 'calc(100% + 0.5rem)',
-            right: 0,
+            left: 0,
             width: 'max-content',
             maxWidth: '90vw',
           }}

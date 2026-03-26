@@ -1,12 +1,15 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import Box from '@mui/material/Box'
 import Clipboard from '../Clipboard'
+import { useResponsive } from '@/hooks/useResponsive'
+import { truncateHash } from '@/utils/format'
 
 export default function AddressLink({ address, plain = false, highlight = [], clipboard = true, children, onClick, className = '' }) {
   const highlights = Array.isArray(highlight) ? highlight : [highlight]
   const isHighlighted = highlights.includes(address)
-  const display = children || address
+  const { isPhone } = useResponsive()
+  const display = children || (isPhone ? truncateHash(address, 8, 6) : address)
   const linkTo = address.length === 40 ? `/contract/${address}` : `/address/${address}`
 
   return (

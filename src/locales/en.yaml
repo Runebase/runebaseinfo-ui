@@ -122,6 +122,8 @@ contract:
   transaction_list: Transaction List
 misc:
   misc: Misc
+  tools_title: Tools & Analytics
+  send_raw_tx: Send Raw Transaction
   charts_title: Charts
   rich_list_title: Rich List
   biggest_miners_title: Biggest Miners
@@ -160,6 +162,7 @@ misc:
     yearly_roi: Yearly ROI
 nav:
   search: Search by Block / Transaction / Address / Contract / Token
+  search_placeholder: "Search address, tx, block, token..."
 pagination:
   go_to: Go to
 footer:
@@ -168,5 +171,40 @@ action:
   copy: Copy
   view_all: View All
   go: Go
+  show_details: Show Details
+  hide_details: Hide Details
+search:
+  type_address: Address
+  type_block: Block
+  type_transaction: Transaction
+  type_contract: Contract
+  no_results: "No results found for \"{{query}}\""
+  recent: Recent Searches
+  searching: Searching...
+export:
+  csv: Export CSV
+  exporting: Exporting...
+table:
+  compact: Compact
+  comfortable: Comfortable
+  sort_by: "Sort by {{column}}"
+chart:
+  zoom_reset: Reset Zoom
+  date_range: Date Range
+  range_7d: 7D
+  range_30d: 30D
+  range_90d: 90D
+  range_1y: 1Y
+  range_all: All
+empty:
+  no_blocks_for_date: No blocks found for this date
+  no_tokens: No tokens have been created yet
+  no_transactions: No transactions found
+  try_different_date: Try a different date
+  go_home: Go to Homepage
+  view_blocks: View Latest Blocks
+tx_view:
+  simplified: Simplified
+  detailed: Detailed
 notification:
   new_transaction_received: You received a new transaction

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import BigNumber from 'bignumber.js'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useLazyGetInfoQuery, useLazyGetAddressQuery } from '@/store/api'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { formatRunebase } from '@/utils/format'
 import { toHexAddress } from '@/utils/address'
-import Address from '@/models/address'
-import MiscModel from '@/models/misc'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
@@ -19,9 +19,12 @@ export default function StakeCalculator() {
   const [address, setAddress] = useState('')
   const [weightInput, setWeightInput] = useState('')
 
+  const [triggerGetInfo] = useLazyGetInfoQuery()
+  const [triggerGetAddress] = useLazyGetAddressQuery()
+
   useEffect(() => {
     document.title = t('misc.stake_calculator.title') + ' - explorer.runebase.io'
-    MiscModel.info().then(({ netStakeWeight: w }) => setNetStakeWeight(w)).catch(() => {})
+    triggerGetInfo().unwrap().then(({ netStakeWeight: w }) => setNetStakeWeight(w)).catch(() => {})
 
     const onWeight = (w) => setNetStakeWeight(w)
     subscribe('blockchain', 'stakeweight', onWeight)
@@ -33,14 +36,14 @@ export default function StakeCalculator() {
     const addresses = address.split(',')
     try {
       if (addresses.every(toHexAddress)) {
-        Address.get(address).then(({ balance }) => {
-          setWeightInput((balance / 1e8).toFixed(8))
+        triggerGetAddress(address).unwrap().then(({ balance }) => {
+          setWeightInput(new BigNumber(balance).dividedBy(1e8).toFixed(8))
         }).catch(() => {})
       }
     } catch (err) {}
   }, [address])
 
-  const weight = Math.round(Number(weightInput.replace(',', '')) * 1e8) || 0
+  const weight = new BigNumber(weightInput.replace(',', '')).times(1e8).integerValue().toNumber() || 0
   const n = 8
   const p = weight ? 1 - Math.exp(-weight / (n * netStakeWeight)) : 0
   const expectedTime = weight ? n * 16 * (1 / n - p * p) / (p - p * p) : 0
@@ -101,7 +104,7 @@ export default function StakeCalculator() {
         <Box>
           <Typography variant="body2" fontWeight="bold" gutterBottom>{t('misc.stake_calculator.yearly_roi')}</Typography>
           <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
-            {netStakeWeight ? (reward * 365 * 675 / netStakeWeight * 100).toFixed(2) : 0}%
+            {netStakeWeight ? new BigNumber(reward).times(365).times(675).dividedBy(netStakeWeight).times(100).toFixed(2) : 0}%
           </Typography>
         </Box>
       </Stack>

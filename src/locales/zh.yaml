@@ -122,6 +122,8 @@ contract:
   transaction_list: 交易列表
 misc:
   misc: 其他
+  tools_title: 工具与分析
+  send_raw_tx: 发送原始交易
   charts_title: 图表
   rich_list_title: 富豪榜
   biggest_miners_title: 挖矿榜
@@ -159,6 +161,7 @@ misc:
     yearly_roi: 年化收益率
 nav:
   search: 搜索 区块 / 交易 / 地址 / 合约 / Token
+  search_placeholder: "搜索地址、交易、区块、Token..."
 pagination:
   go_to: 前往
 footer:
@@ -167,5 +170,40 @@ action:
   copy: 复制
   view_all: 查看全部
   go: 前往
+  show_details: 显示详情
+  hide_details: 隐藏详情
+search:
+  type_address: 地址
+  type_block: 区块
+  type_transaction: 交易
+  type_contract: 合约
+  no_results: "未找到 \"{{query}}\" 的结果"
+  recent: 最近搜索
+  searching: 搜索中...
+export:
+  csv: 导出 CSV
+  exporting: 导出中...
+table:
+  compact: 紧凑
+  comfortable: 舒适
+  sort_by: "按 {{column}} 排序"
+chart:
+  zoom_reset: 重置缩放
+  date_range: 日期范围
+  range_7d: 7天
+  range_30d: 30天
+  range_90d: 90天
+  range_1y: 1年
+  range_all: 全部
+empty:
+  no_blocks_for_date: 该日期没有区块
+  no_tokens: 尚未创建任何 Token
+  no_transactions: 未找到交易
+  try_different_date: 换个日期试试
+  go_home: 回到首页
+  view_blocks: 查看最新区块
+tx_view:
+  simplified: 简化
+  detailed: 详细
 notification:
   new_transaction_received: 你收到了一条新交易

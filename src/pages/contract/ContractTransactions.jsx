@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router'
+import { useGetContractTransactionsWithBriefQuery, useLazyGetTransactionBriefQuery } from '@/store/api'
 import { useWebSocket } from '@/hooks/useWebSocket'
-import Contract from '@/models/contract'
-import TransactionModel from '@/models/transaction'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Pagination from '@/components/Pagination'
@@ -12,23 +11,27 @@ export default function ContractTransactions() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const { subscribe, unsubscribe } = useWebSocket()
-  const [totalCount, setTotalCount] = useState(0)
-  const [transactions, setTransactions] = useState([])
+  const [liveTransactions, setLiveTransactions] = useState([])
   const currentPage = Number(searchParams.get('page') || 1)
+
+  const [triggerGetTxBrief] = useLazyGetTransactionBriefQuery()
+
+  const { data } = useGetContractTransactionsWithBriefQuery({ id, page: currentPage - 1, pageSize: 20 })
+  const totalCount = data?.totalCount || 0
+  const fetchedTransactions = data?.transactions || []
   const pages = Math.ceil(totalCount / 20)
 
+  const transactions = [...liveTransactions.filter(lt => !fetchedTransactions.some(t => t.id === lt.id)), ...fetchedTransactions]
+
   useEffect(() => {
-    Contract.getTransactions(id, { page: currentPage - 1, pageSize: 20 }).then(async ({ totalCount: tc, transactions: txIds }) => {
-      setTotalCount(tc)
-      setTransactions(await TransactionModel.getBrief(txIds))
-    }).catch(() => {})
+    setLiveTransactions([])
   }, [id, currentPage])
 
   useEffect(() => {
     const onTx = async ({ id: txId, address }) => {
       if (address === id) {
-        const tx = await TransactionModel.getBrief(txId)
-        setTransactions(prev => prev.every(t => t.id !== txId) ? [tx, ...prev] : prev)
+        const tx = await triggerGetTxBrief(txId).unwrap()
+        setLiveTransactions(prev => prev.every(t => t.id !== txId) ? [tx, ...prev] : prev)
       }
     }
     subscribe('address/' + id, 'address/transaction', onTx)
